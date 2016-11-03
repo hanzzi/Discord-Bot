@@ -17,3 +17,6 @@ c:\users\sjf59mbr\documents\visual studio 2015\Projects\clear-bot\clear-bot\bin\
 c:\users\sjf59mbr\documents\visual studio 2015\Projects\clear-bot\clear-bot\bin\Debug\RestSharp.xml
 c:\users\sjf59mbr\documents\visual studio 2015\Projects\clear-bot\clear-bot\obj\Debug\clear-bot.exe
 c:\users\sjf59mbr\documents\visual studio 2015\Projects\clear-bot\clear-bot\obj\Debug\clear-bot.pdb
+C:\Users\sjf59mbr\Desktop\Discord-Bot\clear-bot\clear-bot\bin\Debug\clear-bot.exe.config
+C:\Users\sjf59mbr\Desktop\Discord-Bot\clear-bot\clear-bot\obj\Debug\clear-bot.exe
+C:\Users\sjf59mbr\Desktop\Discord-Bot\clear-bot\clear-bot\obj\Debug\clear-bot.pdb
