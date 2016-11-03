@@ -1,6 +1,6 @@
-Encoding Converter
+Discord-Bot
 
-Encoding Converter is a simple collection of snippets of code used for my private Discord bot and various other things
+A collection of coding snippets for a discord bot me and some colleagues of mine are developing
 
 Version:
 0.1
