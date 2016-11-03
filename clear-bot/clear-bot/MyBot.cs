@@ -85,7 +85,7 @@ namespace test_bot
                 {
 
 
-                    await e.Channel.SendMessage("Commands: !clear, !clearone, !test, !pm, !ruslet, !oh, !torbinstop, !torbinstart, !rusletcommands, !cmd, !bindec, !binenc");
+                    await e.Channel.SendMessage("Commands: !clear, !clearone, !test, !pm, !ruslet, !oh, !torbinstop, !torbinstart, !rusletcommands, !cmd, !bindec, !binenc, !hexenc, !hexdec");
 
 
                 });
@@ -618,15 +618,20 @@ namespace test_bot
                 }
 
             }
+            string Commandtest = "";
+            if (e.Message.Text.Length >= 7)
+            {
 
-            string Commandtest = e.Message.Text.Substring(0, 7);
+                Commandtest = e.Message.Text.Substring(0, 7);
+
+            }
 
             if (Commandtest == "!bindec")
             {
 
                 int maxchar = e.Message.Text.Length;
 
-                int binstart = maxchar - 7;
+                int binstart = maxchar - 8;
 
 
                 string bincode = e.Message.Text.Substring(8, binstart);
@@ -642,15 +647,43 @@ namespace test_bot
 
                 int maxchar = e.Message.Text.Length;
 
-                int binstart = maxchar - 7;
+                int binstart = maxchar - 8;
 
 
                 string text = e.Message.Text.Substring(8, binstart);
 
+
+                e.Channel.SendMessage(EncodingConverter.StringtoBinary(text));
+
+            }
+            else if (Commandtest == "!hexdec")
+            {
+
+                int maxchar = e.Message.Text.Length;
+
+                int hexstart = maxchar - 8;
+
+
+                string text = e.Message.Text.Substring(8, hexstart);
+
                 string bincode = text;
 
 
-                e.Channel.SendMessage(EncodingConverter.StringtoBinary(bincode));
+                e.Channel.SendMessage(EncodingConverter.HexToString(text));
+
+            }
+            else if (Commandtest == "!hexenc")
+            {
+
+                int maxchar = e.Message.Text.Length;
+
+                int hexstart = maxchar - 8;
+
+
+                string text = e.Message.Text.Substring(8, hexstart);
+
+
+                e.Channel.SendMessage(EncodingConverter.StringToHex(text));
 
             }
 
@@ -697,6 +730,33 @@ namespace test_bot
                 }
                 return sb.ToString();
 
+            }
+            public static string StringToHex(string Data)
+            {
+                byte[] bytearray = Encoding.Default.GetBytes(Data);
+                string HexString = BitConverter.ToString(bytearray);
+                HexString = HexString.Replace("-", "");
+                return HexString;
+            }
+
+            public static string HexToString(string Data)
+            {
+                if (Data == null)
+                {
+                    throw new ArgumentNullException("Empty string");
+                }
+                if (Data.Length % 2 != 0)
+                {
+                    throw new ArgumentException("String must have an even length");
+                }
+                byte[] bytes = new byte[Data.Length / 2];
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    string CurrentHex = Data.Substring(i * 2, 2);
+                    bytes[i] = Convert.ToByte(CurrentHex, 16);
+                }
+                string ReturnValue = Encoding.GetEncoding("UTF-8").GetString(bytes);
+                return ReturnValue.ToString();
             }
         }
 
