@@ -51,6 +51,14 @@ namespace Music
 
         }
 
+        public void AudioConfig()
+        {
+            _client.UsingAudio(x =>
+            {
+                x.Mode = AudioMode.Outgoing;
+            });
+        }
+
         // Log Functon
         public void Log(object sender, LogMessageEventArgs e)
         {
@@ -140,6 +148,61 @@ namespace Music
                     string Wolframify = WolframQueryHandler(Query);
                     await e.Channel.SendMessage(Wolframify);
                 });
+
+            CService.CreateCommand("D10")
+                .Description("Rolls a D10")
+                .Do(async (e) =>
+                {
+                    Random rnd = new Random();
+                    int Roll = rnd.Next(1, 11);
+                    await e.Channel.SendMessage("The Dice Landed on " + Roll.ToString());
+                });
+            CService.CreateCommand("D6")
+                .Description("Rolls a D6")
+                .Do(async (e) =>
+                {
+                    Random rnd = new Random();
+                    int Roll = rnd.Next(1, 7);
+                    await e.Channel.SendMessage("The Dice Landed on " + Roll.ToString());
+                });
+
+            CService.CreateCommand("CatBomb")
+                .Description("Bombs the chat with cats")
+                .Do(async (e) =>
+                {
+                    e.Channel.SendFile("cat.jpg");
+                    e.Channel.SendFile("cat2.jpg");
+                    e.Channel.SendFile("cat3.jpg");
+                    e.Channel.SendFile("cat4.jpg");
+                    e.Channel.SendFile("cat5.jpg");
+                    e.Channel.SendFile("cat6.jpg");
+                    e.Channel.SendFile("cat7.jpg");
+                    e.Channel.SendFile("cat8.jpg");
+                    e.Channel.SendFile("cat9.jpg");
+
+                });
+
+            CService.CreateCommand("Join")
+                .Description("Joins a voice channel")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("Trying to join First Channel");
+                    var User = e.User.Id;
+                    var Server = e.User.Server;
+
+                    await JoinChannel(User, Server);
+                });
+        }
+
+
+        public async Task JoinChannel(ulong user, Server Server)
+        {
+            DiscordClient _client = new DiscordClient();
+
+            var VoiceChannel = _client.FindServers("243635934212521984").FirstOrDefault().VoiceChannels.FirstOrDefault();
+
+            var _vClient = await _client.GetService<AudioService>()
+                .Join(VoiceChannel);
         }
 
 
