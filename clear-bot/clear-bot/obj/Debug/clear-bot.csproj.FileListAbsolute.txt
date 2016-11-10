@@ -36,3 +36,4 @@ C:\Users\sjf59mbr\Desktop\Discord-Bot\clear-bot\clear-bot\bin\Debug\Nito.AsyncEx
 C:\Users\sjf59mbr\Desktop\Discord-Bot\clear-bot\clear-bot\bin\Debug\Nito.AsyncEx.Enlightenment.xml
 C:\Users\sjf59mbr\Desktop\Discord-Bot\clear-bot\clear-bot\bin\Debug\RestSharp.xml
 C:\Users\sjf59mbr\Desktop\Discord-Bot\clear-bot\clear-bot\obj\Debug\clear-bot.csprojResolveAssemblyReference.cache
+C:\Users\sjf59mbr\Desktop\Discord-Bot\clear-bot\clear-bot\bin\Debug\Discord.Net.Audio.dll
