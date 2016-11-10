@@ -25,7 +25,7 @@ namespace Music
             _client = new DiscordClient(x =>
             {
                 x.AppName = "DankBot";
-                x.LogLevel = LogSeverity.Info;
+                x.LogLevel = LogSeverity.Debug;
                 x.LogHandler = Log;
 
             });
@@ -56,13 +56,22 @@ namespace Music
             _client.UsingAudio(x =>
             {
                 x.Mode = AudioMode.Outgoing;
+                x.Bitrate = 64000;
+                x.EnableEncryption = true;
+                
             });
         }
 
         // Log Functon
         public void Log(object sender, LogMessageEventArgs e)
         {
-            Console.WriteLine($"[{e.Severity}] [{e.Source}] [{e.Message}]");
+            if (e.Exception != null)
+            {
+                Console.WriteLine($"[{e.Severity}] [{e.Source}] [{e.Message}] [{e.Exception}]");
+            } else
+            {
+                Console.WriteLine($"[{e.Severity}] [{e.Source}] [{e.Message}]");
+            }
         }
 
         // Commands
@@ -71,7 +80,7 @@ namespace Music
             var CService = _client.GetService<CommandService>();
 
             // returns pong
-            CService.CreateCommand("ping!")
+            CService.CreateCommand("ping")
                 .Description("Returns with an opposite but totally satisfactory answer.")
                 .Do(async (e) =>
                 {
@@ -157,6 +166,7 @@ namespace Music
                     int Roll = rnd.Next(1, 11);
                     await e.Channel.SendMessage("The Dice Landed on " + Roll.ToString());
                 });
+
             CService.CreateCommand("D6")
                 .Description("Rolls a D6")
                 .Do(async (e) =>
@@ -182,29 +192,121 @@ namespace Music
 
                 });
 
+            CService.CreateCommand("Snek")
+                .Description("What is Snek? Nobody knows.")
+                .Do(async (e) =>
+               {
+                   await e.Channel.SendMessage("Snek is our lord and savior only surpassed by the almighty Hanzzi and his band of imaginary friends the twins Depression and Debugging.");
+               });
+
             CService.CreateCommand("Join")
                 .Description("Joins a voice channel")
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage("Trying to join First Channel");
-                    var User = e.User.Id;
-                    var Server = e.User.Server;
+                    //await e.Channel.SendMessage("Trying to join First Channel");
+                    ulong User = e.User.Id;
+                    Server Server = e.User.Server;
+                    Channel Channel = e.User.VoiceChannel;
+                    Channel Test = e.Server.GetChannel(243635934212521985);
 
-                    await JoinChannel(User, Server);
+                    await JoinChannel(User, Server, Test, _audio, Test, e);
+                });
+
+            CService.CreateCommand("Clear")
+                .Description("Clears the Console so I can actually see whats happening")
+                .Do((e) =>
+                {
+                    Console.Clear();
                 });
         }
 
 
-        public async Task JoinChannel(ulong user, Server Server)
+        public async Task JoinChannel(ulong user, Server Server, Channel Channel, IAudioClient _audio, Channel Test, CommandEventArgs e)
         {
             DiscordClient _client = new DiscordClient();
 
-            var VoiceChannel = _client.FindServers("243635934212521984").FirstOrDefault().VoiceChannels.FirstOrDefault();
 
-            var _vClient = await _client.GetService<AudioService>()
-                .Join(VoiceChannel);
+            //var VoiceChannel = _client.FindServers(Server.ToString()).FirstOrDefault().VoiceChannels.FirstOrDefault();
+
+            _client.UsingAudio(x =>
+            {
+                x.Mode = AudioMode.Outgoing;
+            });
+
+            try
+            {
+
+                var _vClient = await _client.GetService<AudioService>()
+                    .Join(Channel);
+
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            try
+            {
+                await _client.GetService<AudioService>().Join(Test);
+
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            try
+            {
+                await _client.AddService<AudioService>().Join(Channel);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            try
+            {
+                await _client.AddService<AudioService>().Join(Test);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+
+
+            //await _audio.Join(VoiceChannel);
+
+            /*
+            AudioService Audio = new AudioService();
+            try
+            {
+                await Audio.Join(Channel);
+            } catch (Exception ex)
+            {
+                Console.WriteLine("Audio Exception  " + ex.ToString());
+            }
+            */
+            /*
+            try
+            {
+                var _vClient = await _client.GetService<AudioService>()
+                .Join(Channel);
+
+                
+
+                
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            */
+
+
+
+
         }
-
+        
 
 
         // Converts a string to Lower LeetSpeak
