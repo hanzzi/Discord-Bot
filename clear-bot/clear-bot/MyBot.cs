@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Audio;
 
 using System;
 using System.Collections.Generic;
@@ -49,12 +50,18 @@ namespace test_bot
 
             });
 
-            var commands = discord.GetService<CommandService>();
+            discord.UsingAudio(x => 
+            {
+                x.Mode = AudioMode.Outgoing;
+            });
 
-            commands.CreateCommand("clear")
+            var commands = discord.GetService<CommandService>();
+            
+
+            commands.CreateCommand("cldear")
                 .Do(async (e) =>
                 {
-                    Role admin = e.Server.GetRole(240435153548214272);
+                    Role admin = e.Server.GetRole(244091603621249024);
                     bool test = e.User.HasRole(admin);
 
                     if (test == true)
@@ -66,6 +73,26 @@ namespace test_bot
                     }
                 });
 
+            commands.CreateCommand("clear")
+                .Parameter("amount", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    Message[] messageToDelete;
+                    messageToDelete = await e.Channel.DownloadMessages(1);
+
+                    await e.Channel.DeleteMessages(messageToDelete);
+                    var hans = Convert.ToInt32(e.GetArg("amount"));
+                    int i = hans;
+
+                    while (i > 0)
+                    {
+
+                        await e.Channel.DeleteMessages(messageToDelete);
+                        i--;
+                    }
+
+
+                });
 
 
             commands.CreateCommand("test")
@@ -576,12 +603,34 @@ namespace test_bot
 
                 });
 
+            commands.CreateCommand("bask")
+                .Do(async (e) =>
+                {
+                   
+                        await e.Channel.SendMessage("sgfh");
+                   
+                });
+
             commands.CreateCommand("torbinstart")
                 .Do(async (e) =>
                 {
 
                     torbins = 1;
                     await e.Channel.SendMessage("'Oh shit it's torbins' just started");
+
+                });
+
+            commands.CreateCommand("cat")
+                .Do(async (e) =>
+                {
+
+                    
+
+                        Channel test = e.Server.GetChannel(243635934212521985);
+                        string don = test.ToString();
+
+                        await e.Channel.SendMessage(don);
+                       
 
                 });
 
@@ -597,15 +646,17 @@ namespace test_bot
             discord.ExecuteAndWait(async () =>
             {
 
-                await discord.Connect("MjM3ODYwNjk4OTMwMTUxNDI0.Cud2BA.Fq7eSEoiuBdXwgNk00GZILJ_gco", TokenType.Bot);
                 await discord.Connect("MjQzNjM4NDYwNjYzOTg4MjI1.Cvx5hQ.OzFeFIy2i9ESF0IrY68zBXRUFUA", TokenType.Bot);
-
+                
             });
 
         }
 
         private void Discord_MessageReceived(object sender, MessageEventArgs e)
         {
+
+            
+             
 
             if (torbins == 1)
             {
