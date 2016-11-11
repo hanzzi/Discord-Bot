@@ -14,7 +14,7 @@ namespace test_bot
 {
     class MyBot
     {
-        int torbins = 0;
+        int salty = 0;
         int russianstart = 0;
         string player1 = "";
         string player2 = "";
@@ -47,7 +47,7 @@ namespace test_bot
 
                 x.PrefixChar = '!';
                 x.AllowMentionPrefix = true;
-
+                x.HelpMode = HelpMode.Public;
             });
 
             discord.UsingAudio(x => 
@@ -58,91 +58,36 @@ namespace test_bot
 
             var commands = discord.GetService<CommandService>();
         
-            commands.CreateCommand("cldear")
-                .Do(async (e) =>
-                {
-                    Role admin = e.Server.GetRole(244091603621249024);
-                    bool test = e.User.HasRole(admin);
-
-                    if (test == true)
-                    {
-                        Message[] messageToDelete;
-                        messageToDelete = await e.Channel.DownloadMessages(100);
-
-                        await e.Channel.DeleteMessages(messageToDelete);
-                    }
-                });
 
             commands.CreateCommand("clear")
+                .Description("Deletes messages(only for admins)")
                 .Parameter("amount", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
                     Message[] messageToDelete;
                     messageToDelete = await e.Channel.DownloadMessages(1);
-
                     await e.Channel.DeleteMessages(messageToDelete);
-                    var hans = Convert.ToInt32(e.GetArg("amount"));
-                    int i = hans;
 
-                    while (i > 0)
+                Role admin = e.Server.GetRole(244091603621249024);
+                bool testforadmin = e.User.HasRole(admin);
+
+                    if (testforadmin == true)
                     {
+                        var hans = Convert.ToInt32(e.GetArg("amount"));
+                        int i = hans;
 
-                        await e.Channel.DeleteMessages(messageToDelete);
-                        i--;
+                        while (i > 0)
+                        {
+
+                            await e.Channel.DeleteMessages(messageToDelete);
+                            i--;
+                        }
                     }
 
-
-                });
-
-
-            commands.CreateCommand("test")
-                .Do(async (e) =>
-                {
-
-                    string test = e.Message.MentionedUsers.ToString();
-
-                    await e.Channel.SendMessage(test);
-
-
-                });
-
-
-            commands.CreateCommand("cmd")
-                .Do(async (e) =>
-                {
-
-
-                    await e.Channel.SendMessage("Commands: !clear, !clearone, !test, !pm, !ruslet, !oh, !torbinstop, !torbinstart, !rusletcommands, !cmd, !bindec, !binenc, !hexenc, !hexdec");
-
-
-                });
-
-            commands.CreateCommand("rusletcommands")
-                .Do(async (e) =>
-                {
-
-
-                    await e.Channel.SendMessage("Commands: !ruslet, !join, !start, !shoot, !rusletcommands");
-
-
-                });
-
-            commands.CreateCommand("clearone")
-                .Do(async (e) =>
-                {
-                    Role admin = e.Server.GetRole(240435153548214272);
-                    bool test = e.User.HasRole(admin);
-
-                    if (test == true)
-                    {
-                        Message[] messageToDelete;
-                        messageToDelete = await e.Channel.DownloadMessages(2);
-
-                        await e.Channel.DeleteMessages(messageToDelete);
-                    }
                 });
 
             commands.CreateCommand("pm")
+                .Description("Don't know try it.")
                 .Do(async (e) =>
                 {
                     Message[] messageToDelete;
@@ -187,447 +132,70 @@ namespace test_bot
 
                 });
 
-            commands.CreateCommand("ruslet")
+            commands.CreateCommand("Dice")
+                .Description("Roll the dizes. the maxium number of sides is 100.")
+                .Parameter("sides", ParameterType.Optional)
                 .Do(async (e) =>
                 {
-                    Message[] messageToDelete;
-                    messageToDelete = await e.Channel.DownloadMessages(1);
-
-                    await e.Channel.DeleteMessages(messageToDelete);
-
-                    if (russianstart == 0)
+                    string sides1 = e.GetArg("sides");
+                    if (sides1 == "")
                     {
-
-                        russianstart = 1;
-
-                        await e.Channel.SendMessage("everyone");
-                        await e.Channel.SendMessage("A game of russian roulette has started to join type ''!join'' ");
-
-                    }
-                    else if (russianstart != 0)
-                    {
-
-                        await e.Channel.SendMessage("Wait for the last game to end before starting a new one!");
-
-                    }
-                });
-
-            commands.CreateCommand("join")
-                            .Do(async (e) =>
-                            {
-                                if (russianstart == 1 || russianstart == 2)
-                                {
-
-
-                                    switch (playernum)
-                                    {
-                                        case 0:
-                                            playernum++;
-                                            player1 = e.User.Name;
-                                            player1mem = e.User.Mention;
-                                            await e.Channel.SendMessage("Welcome to this game of russian roulette.");
-                                            break;
-                                        case 1:
-                                            playernum++;
-                                            player2 = e.User.Name;
-                                            player2mem = e.User.Mention;
-                                            await e.Channel.SendMessage("Welcome to this game of russian roulette.");
-                                            russianstart = 2;
-                                            break;
-                                        case 2:
-                                            playernum++;
-                                            player3 = e.User.Name;
-                                            player3mem = e.User.Mention;
-                                            await e.Channel.SendMessage("Welcome to this game of russian roulette.");
-                                            break;
-                                        case 3:
-                                            playernum++;
-                                            player4 = e.User.Name;
-                                            player4mem = e.User.Mention;
-                                            await e.Channel.SendMessage("Welcome to this game of russian roulette.");
-                                            break;
-                                        case 4:
-                                            playernum++;
-                                            player5 = e.User.Name;
-                                            player5mem = e.User.Mention;
-                                            await e.Channel.SendMessage("Welcome to this game of russian roulette.");
-                                            break;
-                                        case 5:
-                                            playernum++;
-                                            player6 = e.User.Name;
-                                            player6mem = e.User.Mention;
-                                            await e.Channel.SendMessage("Welcome to this game of russian roulette.");
-                                            break;
-                                        case 6:
-                                            await e.Channel.SendMessage("Sorry but the game is full.");
-                                            break;
-                                    }
-
-                                }
-
-                            });
-
-            commands.CreateCommand("start")
-                .Do(async (e) =>
-                {
-
-                    Random ran = new Random();
-                    int ulucky = ran.Next(1, playernum);
-
-                    if (russianstart == 2)
-                    {
-
-                        await e.Channel.SendMessage("The game has started and the players are:");
-                        switch (playernum)
-                        {
-
-                            case 2:
-                                await e.Channel.SendMessage(player1mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player2mem);
-                                break;
-                            case 3:
-                                await e.Channel.SendMessage(player1mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player2mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player3mem);
-                                break;
-                            case 4:
-                                await e.Channel.SendMessage(player1mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player2mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player3mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player4mem);
-                                break;
-                            case 5:
-                                await e.Channel.SendMessage(player1mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player2mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player3mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player4mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player5mem);
-                                break;
-                            case 6:
-                                await e.Channel.SendMessage(player1mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player2mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player3mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player4mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player5mem);
-                                System.Threading.Thread.Sleep(500);
-                                await e.Channel.SendMessage(player6mem);
-                                break;
-                        }
-                        await e.Channel.SendMessage("test" + russianstart);
-                        russianstart = 3;
-                        await e.Channel.SendMessage("test" + russianstart);
-
-                    }
-                    else if (russianstart == 1)
-                    {
-
-                        await e.Channel.SendMessage("Not enough player. the minimum is 2 players.");
-
+                        sides1 = "6";
                     }
 
-                });
+                    int sides = Int32.Parse(sides1);
 
-            commands.CreateCommand("shoot")
-                .Do(async (e) =>
-                {
-
-
-                    Random ran = new Random();
-                    int unlucky = ran.Next(1, playernum);
-
-                    await e.Channel.SendMessage("5");
-                    System.Threading.Thread.Sleep(1000);
-                    await e.Channel.SendMessage("4");
-                    System.Threading.Thread.Sleep(1000);
-                    await e.Channel.SendMessage("3");
-                    System.Threading.Thread.Sleep(1000);
-                    await e.Channel.SendMessage("2");
-                    System.Threading.Thread.Sleep(1000);
-                    await e.Channel.SendMessage("1");
-                    System.Threading.Thread.Sleep(1000);
-
-                    switch (unlucky)
+                    if (sides > 100)
                     {
-                        case 1:
-                            switch (playernum)
-                            {
-                                case 2:
-                                    await e.Channel.SendMessage(player1mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    break;
-                                case 3:
-                                    await e.Channel.SendMessage(player1mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    break;
-                                case 4:
-                                    await e.Channel.SendMessage(player1mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    break;
-                                case 5:
-                                    await e.Channel.SendMessage(player1mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player5mem + " Click");
-                                    break;
-                                case 6:
-                                    await e.Channel.SendMessage(player1mem + " boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    await e.Channel.SendMessage(player5mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player6mem + " Click");
-                                    break;
-                            }
-                            break;
-                        case 2:
-                            switch (playernum)
-                            {
-                                case 2:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Boom");
-                                    break;
-                                case 3:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    break;
-                                case 4:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    break;
-                                case 5:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player5mem + " Click");
-                                    break;
-                                case 6:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player5mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player6mem + " Click");
-                                    break;
-                            }
-                            break;
-                        case 3:
-                            switch (playernum)
-                            {
-                                case 3:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Boom");
-                                    break;
-                                case 4:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    break;
-                                case 5:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player5mem + " Click");
-                                    break;
-                                case 6:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player5mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player6mem + " Boom");
-                                    break;
-                            }
-                            break;
-                        case 4:
-                            switch (playernum)
-                            {
-                                case 4:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Boom");
-                                    break;
-                                case 5:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player5mem + " Click");
-                                    break;
-                                case 6:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player5mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player6mem + " Click");
-                                    break;
-                            }
-                            break;
-                        case 5:
-                            switch (playernum)
-                            {
-                                case 5:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player5mem + " Boom");
-                                    break;
-                                case 6:
-                                    await e.Channel.SendMessage(player1mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player2mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player3mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player4mem + " Click");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player5mem + " Boom");
-                                    System.Threading.Thread.Sleep(500);
-                                    await e.Channel.SendMessage(player6mem + " Click");
-                                    break;
-                            }
-                            break;
-                        case 6:
-
-                            await e.Channel.SendMessage(player1mem + " Click");
-                            System.Threading.Thread.Sleep(500);
-                            await e.Channel.SendMessage(player2mem + " Click");
-                            System.Threading.Thread.Sleep(500);
-                            await e.Channel.SendMessage(player3mem + " Click");
-                            System.Threading.Thread.Sleep(500);
-                            await e.Channel.SendMessage(player4mem + " Click");
-                            System.Threading.Thread.Sleep(500);
-                            await e.Channel.SendMessage(player5mem + " Click");
-                            System.Threading.Thread.Sleep(500);
-                            await e.Channel.SendMessage(player6mem + " Boom");
-
-                            break;
-
+                        sides = 100;
                     }
-                    russianstart = 0;
-
-                });
 
 
-            commands.CreateCommand("oh")
-                .Do(async (e) =>
-                {
-
-                    await e.Channel.SendMessage("Oh shit its Torbins");
-
-                });
-
-            commands.CreateCommand("bask")
-                .Do(async (e) =>
-                {
-                   
-                        await e.Channel.SendMessage("sgfh");
-                   
-                });
-
-            commands.CreateCommand("torbinstart")
-                .Do(async (e) =>
-                {
-
-                    torbins = 1;
-                    await e.Channel.SendMessage("'Oh shit it's torbins' just started");
-
-                });
-
-            commands.CreateCommand("cat")
-                .Do(async (e) =>
-                {
+                    await e.Channel.SendMessage("Your dice has " + sides + " sides");
+                    Random rnd = new Random();
+                    sides++;
                     
-                        Channel test = e.Server.GetChannel(243705158372950018);
-                        string don = test.ToString();
+                    int Roll = rnd.Next(1, sides);
+                    await e.Channel.SendMessage("The Dice Landed on " + Roll.ToString());
+                });
+            
+            commands.CreateCommand("salt")
+                .Description("salt")
+                .Do(async (e) =>
+                {
+                Role admin = e.Server.GetRole(244091603621249024);
+                bool testforadmin = e.User.HasRole(admin);
 
-                        await e.Channel.SendMessage(don);
+                    if (testforadmin == true)
+                    {
+                        salty = 1;
+                        await e.Channel.SendMessage("Bad day?");
+                    }
+                });
+
+            commands.CreateCommand("pepper")
+                .Description("no more salt")
+                .Do(async (e) =>
+                {
+                Role admin = e.Server.GetRole(244091603621249024);
+                bool testforadmin = e.User.HasRole(admin);
+
+                    if (testforadmin == true)
+                    {
+                        salty = 0;
+                        await e.Channel.SendMessage("Good to see you in a better mood!");
+                    }
+                });
+
+            commands.CreateCommand("vc")
+                .Description("join a voice channel does not work!!!")
+                .Do(async (e) =>
+                {
+
+                    Channel test = e.Server.GetChannel(243705158372950018);
+                    string don = test.ToString();
+
+                    await e.Channel.SendMessage(don);
 
                     var audio = await discord.GetService<AudioService>()
                         .Join(test);
@@ -635,14 +203,545 @@ namespace test_bot
 
                 });
 
-            commands.CreateCommand("torbinstop")
+
+            commands.CreateCommand("snek")
+                .Hide()
+                .Do(async (e) =>
+                {
+                    System.Threading.Thread.Sleep(500);
+                    await e.Channel.SendMessage("Do not belive this lying bot!!");
+                    
+                });
+
+
+
+            commands.CreateCommand("ruslet")
+                .Description("russian roulette. Ruslet commands: ruslet, join, start, shoot")
+                .Parameter("commands", ParameterType.Optional)
                 .Do(async (e) =>
                 {
 
-                    torbins = 0;
-                    await e.Channel.SendMessage("'Oh shit it's torbins' just stopped");
+                    string command = e.GetArg("commands");
+                    
+                    Message[] messageToDelete;
+                    messageToDelete = await e.Channel.DownloadMessages(1);
 
+                    await e.Channel.DeleteMessages(messageToDelete);
+
+                    if (command == "")
+                    {
+
+                        if (russianstart == 0)
+                        {
+
+                            russianstart = 1;
+                            player1 = "";
+                            player2 = "";
+                            player3 = "";
+                            player4 = "";
+                            player5 = "";
+                            player6 = "";
+                            player1mem = "";
+                            player2mem = "";
+                            player3mem = "";
+                            player4mem = "";
+                            player5mem = "";
+                            player6mem = "";
+                            playernum = 0;
+
+                            await e.Channel.SendMessage("everyone");
+                            await e.Channel.SendMessage("A game of russian roulette has started to join type ''!ruslet join'' ");
+                            await e.Channel.SendMessage("When all the players have joined type ''!ruslet start'' ");
+                            await e.Channel.SendMessage("When you are ready to shoot type ''!ruslet shoot'' ");
+                        }
+                        else if (russianstart != 0)
+                        {
+
+                            await e.Channel.SendMessage("Wait for the last game to end before starting a new one!");
+
+                        }
+                    } else if (command == "join")
+                    {
+                        if (russianstart == 1 || russianstart == 2)
+                        {
+
+
+                            switch (playernum)
+                            {
+                                case 0:
+                                    playernum++;
+                                    player1 = e.User.Name;
+                                    player1mem = e.User.Mention;
+                                    await e.Channel.SendMessage("Welcome to this game of russian roulette.");
+                                    break;
+                                case 1:
+                                    if (e.User.Name == player1)
+                                    {
+                                        await e.Channel.SendMessage("You have already joined the game");
+                                    }
+                                    else
+                                    {
+                                        playernum++;
+                                        player2 = e.User.Name;
+                                        player2mem = e.User.Mention;
+                                        await e.Channel.SendMessage("Welcome to this game of russian roulette.");
+                                        russianstart = 2;
+                                    }
+                                    break;
+                                case 2:
+                                    if (e.User.Name == player1 || e.User.Name == player2)
+                                    {
+                                        await e.Channel.SendMessage("You have already joined the game");
+                                    }
+                                    else
+                                    {
+                                        playernum++;
+                                        player3 = e.User.Name;
+                                        player3mem = e.User.Mention;
+                                        await e.Channel.SendMessage("Welcome to this game of russian roulette.");
+                                    }
+                                    break;
+                                case 3:
+                                    if (e.User.Name == player1 || e.User.Name == player2 || e.User.Name == player3)
+                                    {
+                                        await e.Channel.SendMessage("You have already joined the game");
+                                    }
+                                    else
+                                    {
+                                        playernum++;
+                                        player4 = e.User.Name;
+                                        player4mem = e.User.Mention;
+                                        await e.Channel.SendMessage("Welcome to this game of russian roulette.");
+                                    }
+                                    break;
+                                case 4:
+                                    if (e.User.Name == player1 || e.User.Name == player2 || e.User.Name == player3 || e.User.Name == player4)
+                                    {
+                                        await e.Channel.SendMessage("You have already joined the game");
+                                    }
+                                    else
+                                    {
+                                        playernum++;
+                                        player5 = e.User.Name;
+                                        player5mem = e.User.Mention;
+                                        await e.Channel.SendMessage("Welcome to this game of russian roulette.");
+                                    }
+                                    break;
+                                case 5:
+                                    if (e.User.Name == player1 || e.User.Name == player2 || e.User.Name == player3 || e.User.Name == player4 || e.User.Name == player5)
+                                    {
+                                        await e.Channel.SendMessage("You have already joined the game");
+                                    }
+                                    else
+                                    {
+                                        playernum++;
+                                        player6 = e.User.Name;
+                                        player6mem = e.User.Mention;
+                                        await e.Channel.SendMessage("Welcome to this game of russian roulette.");
+                                    }
+                                    break;
+                                case 6:
+                                    await e.Channel.SendMessage("Sorry but the game is full.");
+                                    break;
+                            }
+
+                        }
+                    } else if (command == "start")
+                    {
+                        Random ran = new Random();
+                        int ulucky = ran.Next(1, playernum);
+
+                        if (russianstart == 2)
+                        {
+
+                            await e.Channel.SendMessage("The game has started and the players are:");
+                            switch (playernum)
+                            {
+
+                                case 2:
+                                    await e.Channel.SendMessage(player1mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player2mem);
+                                    break;
+                                case 3:
+                                    await e.Channel.SendMessage(player1mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player2mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player3mem);
+                                    break;
+                                case 4:
+                                    await e.Channel.SendMessage(player1mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player2mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player3mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player4mem);
+                                    break;
+                                case 5:
+                                    await e.Channel.SendMessage(player1mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player2mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player3mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player4mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player5mem);
+                                    break;
+                                case 6:
+                                    await e.Channel.SendMessage(player1mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player2mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player3mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player4mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player5mem);
+                                    System.Threading.Thread.Sleep(500);
+                                    await e.Channel.SendMessage(player6mem);
+                                    break;
+                            }
+                            russianstart = 3;
+
+                        }
+                        else if (russianstart == 1)
+                        {
+
+                            await e.Channel.SendMessage("Not enough player. the minimum is 2 players.");
+
+                        }
+                    } else if (command == "shoot")
+                    {
+                        Random rnd = new Random();
+                        int unluck = playernum;
+                        unluck++;
+                        int unlucky = rnd.Next(1, unluck);
+
+                        await e.Channel.SendMessage("5");
+                        System.Threading.Thread.Sleep(1000);
+                        await e.Channel.SendMessage("4");
+                        System.Threading.Thread.Sleep(1000);
+                        await e.Channel.SendMessage("3");
+                        System.Threading.Thread.Sleep(1000);
+                        await e.Channel.SendMessage("2");
+                        System.Threading.Thread.Sleep(1000);
+                        await e.Channel.SendMessage("1");
+                        System.Threading.Thread.Sleep(1000);
+
+                        switch (unlucky)
+                        {
+                            case 1:
+                                switch (playernum)
+                                {
+                                    case 2:
+                                        await e.Channel.SendMessage(player1mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        break;
+                                    case 3:
+                                        await e.Channel.SendMessage(player1mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        break;
+                                    case 4:
+                                        await e.Channel.SendMessage(player1mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        break;
+                                    case 5:
+                                        await e.Channel.SendMessage(player1mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Click");
+                                        break;
+                                    case 6:
+                                        await e.Channel.SendMessage(player1mem + " boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player6mem + " Click");
+                                        break;
+                                }
+                                break;
+                            case 2:
+                                switch (playernum)
+                                {
+                                    case 2:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Boom");
+                                        break;
+                                    case 3:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        break;
+                                    case 4:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        break;
+                                    case 5:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Click");
+                                        break;
+                                    case 6:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player6mem + " Click");
+                                        break;
+                                }
+                                break;
+                            case 3:
+                                switch (playernum)
+                                {
+                                    case 3:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Boom");
+                                        break;
+                                    case 4:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        break;
+                                    case 5:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Click");
+                                        break;
+                                    case 6:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player6mem + " Click");
+                                        break;
+                                }
+                                break;
+                            case 4:
+                                switch (playernum)
+                                {
+                                    case 4:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Boom");
+                                        break;
+                                    case 5:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Click");
+                                        break;
+                                    case 6:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player6mem + " Click");
+                                        break;
+                                }
+                                break;
+                            case 5:
+                                switch (playernum)
+                                {
+                                    case 5:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Boom");
+                                        break;
+                                    case 6:
+                                        await e.Channel.SendMessage(player1mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player2mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player3mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player4mem + " Click");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player5mem + " Boom");
+                                        System.Threading.Thread.Sleep(500);
+                                        await e.Channel.SendMessage(player6mem + " Click");
+                                        break;
+                                }
+                                break;
+                            case 6:
+
+                                await e.Channel.SendMessage(player1mem + " Click");
+                                System.Threading.Thread.Sleep(500);
+                                await e.Channel.SendMessage(player2mem + " Click");
+                                System.Threading.Thread.Sleep(500);
+                                await e.Channel.SendMessage(player3mem + " Click");
+                                System.Threading.Thread.Sleep(500);
+                                await e.Channel.SendMessage(player4mem + " Click");
+                                System.Threading.Thread.Sleep(500);
+                                await e.Channel.SendMessage(player5mem + " Click");
+                                System.Threading.Thread.Sleep(500);
+                                await e.Channel.SendMessage(player6mem + " Boom");
+
+                                break;
+
+                        }
+                        russianstart = 0;
+                    }
                 });
+
+            commands.CreateCommand("fix")
+                .Description("Fix it")
+                .Do(async (e) =>
+                {
+                    
+                    await e.Channel.SendMessage("Fix it riot!");
+                });
+
+            commands.CreateCommand("bindec")
+                .Description("Binary to text converter.")
+                .Parameter("bin", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    int maxchar = e.Message.Text.Length;
+
+                    int binstart = maxchar - 8;
+
+
+                    string bincode = e.Message.Text.Substring(8, binstart);
+
+                    string text = bincode;
+
+
+                    await e.Channel.SendMessage(EncodingConverter.BinarytoString(text));
+                });
+
+            commands.CreateCommand("binenc")
+                .Description("Text to binary converter.")
+                .Parameter("Text", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    int maxchar = e.Message.Text.Length;
+
+                    int binstart = maxchar - 8;
+
+
+                    string text = e.Message.Text.Substring(8, binstart);
+
+
+                   await e.Channel.SendMessage(EncodingConverter.StringtoBinary(text));
+                });
+
+            commands.CreateCommand("hexdec")
+                .Description("Hexadecimal to text converter.")
+                .Parameter("Hex", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    int maxchar = e.Message.Text.Length;
+
+                    int hexstart = maxchar - 8;
+
+
+                    string text = e.Message.Text.Substring(8, hexstart);
+
+                    string bincode = text;
+
+
+                   await e.Channel.SendMessage(EncodingConverter.HexToString(text));
+                });
+
+            commands.CreateCommand("hexenc")
+                .Description("Text to hexadecimal converter.")
+                .Parameter("Text", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    int maxchar = e.Message.Text.Length;
+
+                    int hexstart = maxchar - 8;
+
+
+                    string text = e.Message.Text.Substring(8, hexstart);
+
+
+                    await e.Channel.SendMessage(EncodingConverter.StringToHex(text));
+                });
+
 
             discord.ExecuteAndWait(async () =>
             {
@@ -660,83 +759,15 @@ namespace test_bot
             
              
 
-            if (torbins == 1)
+            if (salty == 1)
             {
 
-                if (e.User.Name == ("Coby"))
+                if (e.Message.Text != "salt" && e.User.Name != "dank_bot")
                 {
 
-                    e.Channel.SendMessage("Oh shit its Torbins");
+                    e.Channel.SendMessage("salt");
 
                 }
-
-            }
-            string Commandtest = "";
-            if (e.Message.Text.Length >= 7)
-            {
-
-                Commandtest = e.Message.Text.Substring(0, 7);
-
-            }
-
-            if (Commandtest == "!bindec")
-            {
-
-                int maxchar = e.Message.Text.Length;
-
-                int binstart = maxchar - 8;
-
-
-                string bincode = e.Message.Text.Substring(8, binstart);
-
-                string text = bincode;
-
-
-                e.Channel.SendMessage(EncodingConverter.BinarytoString(text));
-
-            }
-            else if (Commandtest == "!binenc")
-            {
-
-                int maxchar = e.Message.Text.Length;
-
-                int binstart = maxchar - 8;
-
-
-                string text = e.Message.Text.Substring(8, binstart);
-
-
-                e.Channel.SendMessage(EncodingConverter.StringtoBinary(text));
-
-            }
-            else if (Commandtest == "!hexdec")
-            {
-
-                int maxchar = e.Message.Text.Length;
-
-                int hexstart = maxchar - 8;
-
-
-                string text = e.Message.Text.Substring(8, hexstart);
-
-                string bincode = text;
-
-
-                e.Channel.SendMessage(EncodingConverter.HexToString(text));
-
-            }
-            else if (Commandtest == "!hexenc")
-            {
-
-                int maxchar = e.Message.Text.Length;
-
-                int hexstart = maxchar - 8;
-
-
-                string text = e.Message.Text.Substring(8, hexstart);
-
-
-                e.Channel.SendMessage(EncodingConverter.StringToHex(text));
 
             }
 
