@@ -243,7 +243,8 @@ namespace Music
                         {
                             await usr.Kick().ConfigureAwait(false);
                             await e.Channel.SendMessage(User + " has been KICKED you should pity the fool.");
-                        } catch
+                        }
+                        catch
                         {
                             await e.Channel.SendMessage("Something went wrong most likely that i do not have sufficient permissions");
                         }
