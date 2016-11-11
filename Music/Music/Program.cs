@@ -9,6 +9,7 @@ using Discord.Commands;
 using Discord.Modules;
 using WolframAlphaNET;
 using WolframAlphaNET.Objects;
+using System.Threading;
 
 namespace Music
 {
@@ -25,7 +26,7 @@ namespace Music
             _client = new DiscordClient(x =>
             {
                 x.AppName = "DankBot";
-                x.LogLevel = LogSeverity.Debug;
+                x.LogLevel = LogSeverity.Info;
                 x.LogHandler = Log;
 
             });
@@ -47,8 +48,6 @@ namespace Music
                 await _client.Connect("MjQwNzUyMDgxOTI4MDYwOTI4.Cvy1UQ.wmqwZri4SqxkUSpcI4Evc099Ja0", TokenType.Bot);
 
             });
-
-
         }
 
         public void AudioConfig()
@@ -87,6 +86,13 @@ namespace Music
                     await e.Channel.SendMessage("Pong!");
                 });
 
+            CService.CreateCommand("Whatisthis")
+                .Description("Do you want to know what i am you have come to the right place")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("I am a bot made by Hanzzi (ง •̀_•́)ง#4288 and i can do all kinds of stuff please refer to !help for all of my beautiful commands");
+                });
+
             CService.CreateCommand("hello")
                 .Description("Says hello to a user")
                 .Parameter("user", ParameterType.Unparsed)
@@ -102,6 +108,16 @@ namespace Music
                 {
                     await e.Channel.SendFile("cat.jpg");
                     
+                });
+
+            CService.CreateCommand("MoarCatrito")
+                .Alias("ENHANCEDCATS", "BRING THE KITTIES", "Catwrap")
+                .Description("Enhanced version of the Catrito Command")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendFile("cat.jpg");
+                    await e.Channel.SendFile("cat.jpg");
+                    await e.Channel.SendFile("cat.jpg");
                 });
 
             CService.CreateCommand("docs")
@@ -206,8 +222,17 @@ namespace Music
                 .Do(async (e) =>
                {
                    await e.Channel.SendMessage("Snek is our lord and savior only surpassed by the almighty Hanzzi and his band of imaginary friends the twins Depression and Debugging.");
+                   /*
+                   Thread.Sleep(500);
+                   ulong DankBot = 243638460663988225;
+                   var msgs = (await e.Channel.DownloadMessages(1).ConfigureAwait(false)).Where(m => DankBot == DankBot)?.ToArray();
+                   if (msgs == null || !msgs.Any())
+                       return;
+                   var toDelete = msgs as Message[] ?? msgs.ToArray();
+                   await e.Channel.DeleteMessages(toDelete).ConfigureAwait(false);
+                   */
                });
-
+            /*
             CService.CreateCommand("Join")
                 .Description("Joins a voice channel")
                 .Do(async (e) =>
@@ -220,7 +245,7 @@ namespace Music
 
                     await JoinChannel(User, Server, Test, _audio, Test, e);
                 });
-
+                */
 
             CService.CreateCommand("kick")
                 .Alias("Pity the fool", "this person is annoying", "I am slightly annoyed with this person")
@@ -268,6 +293,22 @@ namespace Music
                     Console.Clear();
                     e.Channel.SendMessage("The Console has been cleared");
                 });
+
+            CService.CreateCommand("XD")
+                .Alias("ecksdee")
+                .Description("XD")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("https://www.youtube.com/watch?v=J7SDyPEjIp0");
+                });
+
+            CService.CreateCommand("Fix")
+                .Alias("Issue", "Broken af", "Cancer Bot", "Bugs", "Report Bug", "Report issue")
+                .Description("Bug reports")
+                .Do(async (e) =>
+               {
+                   await e.Channel.SendMessage("Please forward any issues to the issues tab of my Github Repository: https://github.com/hanzzi/Discord-Bot/issues");
+               });
         }
 
 
