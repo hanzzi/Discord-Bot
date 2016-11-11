@@ -204,16 +204,6 @@ namespace test_bot
                 });
 
 
-            commands.CreateCommand("snek")
-                .Hide()
-                .Do(async (e) =>
-                {
-                    System.Threading.Thread.Sleep(500);
-                    await e.Channel.SendMessage("Do not belive this lying bot!!");
-                    
-                });
-
-
 
             commands.CreateCommand("ruslet")
                 .Description("russian roulette. Ruslet commands: ruslet, join, start, shoot")
