@@ -24,3 +24,6 @@ D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Discord.Net.Mod
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WolframAlpha.NET.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WolframAlpha.NET.pdb
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WolframAlpha.NET.xml
+C:\Users\sjf59mbr\Desktop\Discord-Bot\Music\Music\bin\Debug\Music.exe.config
+C:\Users\sjf59mbr\Desktop\Discord-Bot\Music\Music\obj\Debug\Music.exe
+C:\Users\sjf59mbr\Desktop\Discord-Bot\Music\Music\obj\Debug\Music.pdb

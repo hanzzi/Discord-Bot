@@ -54,10 +54,10 @@ namespace test_bot
             {
                 x.Mode = AudioMode.Outgoing;
             });
-
-            var commands = discord.GetService<CommandService>();
             
 
+            var commands = discord.GetService<CommandService>();
+        
             commands.CreateCommand("cldear")
                 .Do(async (e) =>
                 {
@@ -623,14 +623,15 @@ namespace test_bot
             commands.CreateCommand("cat")
                 .Do(async (e) =>
                 {
-
                     
-
-                        Channel test = e.Server.GetChannel(243635934212521985);
+                        Channel test = e.Server.GetChannel(243705158372950018);
                         string don = test.ToString();
 
                         await e.Channel.SendMessage(don);
-                       
+
+                    var audio = await discord.GetService<AudioService>()
+                        .Join(test);
+
 
                 });
 
@@ -648,6 +649,7 @@ namespace test_bot
 
                 await discord.Connect("MjQzNjM4NDYwNjYzOTg4MjI1.Cvx5hQ.OzFeFIy2i9ESF0IrY68zBXRUFUA", TokenType.Bot);
                 
+
             });
 
         }
@@ -815,7 +817,7 @@ namespace test_bot
         {
 
             Console.WriteLine(e.Message);
-
+            
         }
 
     }
