@@ -176,6 +176,15 @@ namespace Music
                     await e.Channel.SendMessage("The Dice Landed on " + Roll.ToString());
                 });
 
+            CService.CreateCommand("D20")
+                .Description("Rolls a D20")
+                .Do(async (e) =>
+                {
+                    Random rnd = new Random();
+                    int Roll = rnd.Next(1, 21);
+                    await e.Channel.SendMessage("The Dice Landed on " + Roll.ToString());
+                });
+
             CService.CreateCommand("CatBomb")
                 .Description("Bombs the chat with cats")
                 .Do(async (e) =>
@@ -212,11 +221,51 @@ namespace Music
                     await JoinChannel(User, Server, Test, _audio, Test, e);
                 });
 
+
+            CService.CreateCommand("kick")
+                .Alias("Pity the fool", "this person is annoying", "I am slightly annoyed with this person")
+                .Parameter("user")
+                .Description("Kicks a User, what did you expect?")
+                .Do(async (e) =>
+                {
+                    var User = e.GetArg("user");
+
+                    if (e.User.ServerPermissions.KickMembers)
+                    {
+                        var usr = e.Server.FindUsers(User).FirstOrDefault();
+
+                        if (usr == null)
+                        {
+                            await e.Channel.SendMessage("Error User: " + User + " Not Found");
+                            return;
+                        }
+                        try
+                        {
+                            await usr.Kick().ConfigureAwait(false);
+                            await e.Channel.SendMessage(User + " has been KICKED you should pity the fool.");
+                        } catch
+                        {
+                            await e.Channel.SendMessage("Something went wrong most likely that i do not have sufficient permissions");
+                        }
+                    }
+                });
+
+            
             CService.CreateCommand("Clear")
+                .Description("Clear a specified amount of messages")
+                .Parameter("Amount", ParameterType.Unparsed)
+                .Do((e) =>
+                {
+                    e.Channel.SendMessage("LOL JK this feature has not been implemented");
+                });
+
+            CService.CreateCommand("ClearConsole")
+                .Alias("CConsole", "Console", "CC", "Could you please clear the console my good sir")
                 .Description("Clears the Console so I can actually see whats happening")
                 .Do((e) =>
                 {
                     Console.Clear();
+                    e.Channel.SendMessage("The Console has been cleared");
                 });
         }
 
@@ -244,34 +293,7 @@ namespace Music
                 Console.WriteLine(ex.ToString());
             }
 
-            try
-            {
-                await _client.GetService<AudioService>().Join(Test);
-
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            try
-            {
-                await _client.AddService<AudioService>().Join(Channel);
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            try
-            {
-                await _client.AddService<AudioService>().Join(Test);
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+           
 
 
 
