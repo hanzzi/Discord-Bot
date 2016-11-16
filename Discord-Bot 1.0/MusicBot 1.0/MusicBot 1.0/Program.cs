@@ -24,6 +24,7 @@ namespace MusicBot_1._0
 
         private DiscordSocketClient client;
         private CommandService commands;
+        private IAudioClient audio;
         //private CommandHandler handler;
 
         public async Task Run()
@@ -47,13 +48,13 @@ namespace MusicBot_1._0
             var map = new DependencyMap();
             map.Add(client);
 
+
             await InstallCommands();
 
             /*
             handler = new CommandHandler();
             await handler.Install(map);
             */
-
             
 
             await Task.Delay(-1);
