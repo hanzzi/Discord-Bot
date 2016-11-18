@@ -10,6 +10,7 @@ using Discord.Modules;
 using WolframAlphaNET;
 using WolframAlphaNET.Objects;
 using System.Threading;
+using NAudio.Wave;
 
 namespace Music
 {
@@ -38,6 +39,14 @@ namespace Music
                 x.HelpMode = HelpMode.Public;
             });
 
+            _client.UsingAudio(x =>
+            {
+                x.Channels = 2;
+                x.EnableEncryption = false;
+                x.Bitrate = 128;
+                x.Mode = AudioMode.Outgoing;
+            });
+
 
 
             CreateCommands();
@@ -50,16 +59,7 @@ namespace Music
             });
         }
 
-        public void AudioConfig()
-        {
-            _client.UsingAudio(x =>
-            {
-                x.Mode = AudioMode.Outgoing;
-                x.Bitrate = 64000;
-                x.EnableEncryption = true;
-                
-            });
-        }
+        
 
         // Log Functon
         public void Log(object sender, LogMessageEventArgs e)
@@ -232,20 +232,26 @@ namespace Music
                    await e.Channel.DeleteMessages(toDelete).ConfigureAwait(false);
                    */
                });
-            /*
+            
             CService.CreateCommand("Join")
                 .Description("Joins a voice channel")
                 .Do(async (e) =>
                 {
-                    //await e.Channel.SendMessage("Trying to join First Channel");
-                    ulong User = e.User.Id;
-                    Server Server = e.User.Server;
-                    Channel Channel = e.User.VoiceChannel;
-                    Channel Test = e.Server.GetChannel(243635934212521985);
+                    var voiceChannel = e.Message.User.VoiceChannel;
+                    Console.WriteLine("Channel:" + e.Message.User.VoiceChannel.ToString());
 
-                    await JoinChannel(User, Server, Test, _audio, Test, e);
+                    _audio = await _client.GetService<AudioService>()
+                    .Join(voiceChannel);
+
                 });
-                */
+
+            CService.CreateCommand("Leave")
+                .Description("Leaves the voice channels")
+                .Do(async (e) =>
+                {
+                    await _audio.Channel.LeaveAudio();
+                });
+                
 
             CService.CreateCommand("kick")
                 .Alias("Pity the fool", "this person is annoying", "I am slightly annoyed with this person")
@@ -310,67 +316,6 @@ namespace Music
                    await e.Channel.SendMessage("Please forward any issues to the issues tab of my Github Repository: https://github.com/hanzzi/Discord-Bot/issues");
                });
         }
-
-
-        public async Task JoinChannel(ulong user, Server Server, Channel Channel, IAudioClient _audio, Channel Test, CommandEventArgs e)
-        {
-            DiscordClient _client = new DiscordClient();
-
-
-            //var VoiceChannel = _client.FindServers(Server.ToString()).FirstOrDefault().VoiceChannels.FirstOrDefault();
-
-            _client.UsingAudio(x =>
-            {
-                x.Mode = AudioMode.Outgoing;
-            });
-
-            try
-            {
-
-                var _vClient = await _client.GetService<AudioService>()
-                    .Join(Channel);
-
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-           
-
-
-
-            //await _audio.Join(VoiceChannel);
-
-            /*
-            AudioService Audio = new AudioService();
-            try
-            {
-                await Audio.Join(Channel);
-            } catch (Exception ex)
-            {
-                Console.WriteLine("Audio Exception  " + ex.ToString());
-            }
-            */
-            /*
-            try
-            {
-                var _vClient = await _client.GetService<AudioService>()
-                .Join(Channel);
-
-                
-
-                
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            */
-
-
-
-
-        }
-        
 
 
         // Converts a string to Lower LeetSpeak
@@ -439,6 +384,34 @@ namespace Music
                 Value = "The Query was not accepted please try again";
             }
             return Value;
-        } 
+        }
+
+        public void SendAudio(string filePath)
+        {
+            var channelCount = _client.GetService<AudioService>().Config.Channels; // Get the number of AudioChannels our AudioService has been configured to use.
+            var OutFormat = new WaveFormat(48000, 16, channelCount); // Create a new Output Format, using the spec that Discord will accept, and with the number of channels that our client supports.
+            using (var MP3Reader = new Mp3FileReader(filePath)) // Create a new Disposable MP3FileReader, to read audio from the filePath parameter
+            using (var resampler = new MediaFoundationResampler(MP3Reader, OutFormat)) // Create a Disposable Resampler, which will convert the read MP3 data to PCM, using our Output Format
+            {
+                resampler.ResamplerQuality = 60; // Set the quality of the resampler to 60, the highest quality
+                int blockSize = OutFormat.AverageBytesPerSecond / 50; // Establish the size of our AudioBuffer
+                byte[] buffer = new byte[blockSize];
+                int byteCount;
+
+                while ((byteCount = resampler.Read(buffer, 0, blockSize)) > 0) // Read audio into our buffer, and keep a loop open while data is present
+                {
+                    if (byteCount < blockSize)
+                    {
+                        // Incomplete Frame
+                        for (int i = byteCount; i < blockSize; i++)
+                            buffer[i] = 0;
+                    }
+                    _audio.Send(buffer, 0, blockSize); // Send the buffer to Discord
+                }
+            }
+
+        }
+
+
     }
 }

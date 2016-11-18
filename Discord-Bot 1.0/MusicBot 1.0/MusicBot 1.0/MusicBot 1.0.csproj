@@ -160,7 +160,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Modules.cs" />
+    <Compile Include="AdminModule.cs" />
+    <Compile Include="BaseCommands.cs" />
+    <Compile Include="MusicModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

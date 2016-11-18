@@ -167,7 +167,7 @@ namespace MusicBot_1._0
         }
 
         [Command("userinfo"), Summary("Gets user info")]
-        [Alias("user", "whois")]
+        [Alias("user", "whois", "UserInfo", "Userinfo", "userInfo", "User", "WhoIs", "Whois", "whoIs")]
         public async Task UserInfo(IUser user = null)
         {
             var UserInfo = user ?? Context.Client.CurrentUser;
@@ -206,8 +206,6 @@ namespace MusicBot_1._0
         private static string GetUptime
             => (DateTime.Now - Process.GetCurrentProcess().StartTime).ToString(@"dd\.hh\:mm\:ss");
 
-        
-
         [Command("crust"), Summary("Crusty Goodness")]
         public async Task Crust()
         {
@@ -220,12 +218,11 @@ namespace MusicBot_1._0
         [Command("join"), Summary("Join a channel")]
         public async Task JoinChannel(IUserMessage msg, IVoiceChannel Channel = null)
         {
+
             Channel = Channel ?? (msg.Author as IGuildUser)?.VoiceChannel;
             if (Channel == null) { await msg.Channel.SendMessageAsync("User must be in a voice channel, or a voice channel must be passed as an argument."); return; }
 
-            audio = await Channel.ConnectAsync();
-
-            Console.WriteLine(audio.ConnectionState.ToString());
+            
         }
 
         [Command("finddignity"), Summary("Finds dignity")]
@@ -310,35 +307,5 @@ namespace MusicBot_1._0
             }
         }
     }
-
     
-        
-       
-    
-
-
-    [Group("admin")]
-    public class Admin : ModuleBase
-    {
-        DiscordSocketClient client = new DiscordSocketClient();
-
-        [Command("ban"), Summary("Bans a user")]
-        [RequirePermission(GuildPermission.BanMembers)]
-        [Alias("Ban")]
-        public async Task Ban(IGuildUser User, string Reason)
-        {
-            await Context.Channel.SendMessageAsync(User + "Has been banned Reason:" + Reason);
-            await Context.Guild.AddBanAsync(User, 1);
-        }
-
-        [Command("kick"), Summary("Kicks a user")]
-        [RequirePermission(GuildPermission.KickMembers)]
-        [Alias("Kick", "boot", "Boot", "CK", "Ck", "ck")]
-        public async Task Kick(IGuildUser User, [Remainder] string Reason)
-        {
-            await User.KickAsync();
-            await Context.Channel.SendMessageAsync(User + " Has been kicked. Reason: " + Reason);
-            
-        }
-    }
 }
