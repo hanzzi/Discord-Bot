@@ -1,6 +1,6 @@
 Discord-Bot
 
-A collection of coding snippets for a discord bot me and some colleagues of mine are developing
+Several Discord Bots for testing and leasure purposes
 
 Version:
 0.1
