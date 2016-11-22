@@ -11,6 +11,8 @@ using WolframAlphaNET;
 using WolframAlphaNET.Objects;
 using System.Threading;
 using NAudio.Wave;
+using System.Xml;
+using System.IO;
 
 namespace Music
 {
@@ -54,7 +56,13 @@ namespace Music
             // Connect to any and all servers which the bot is assigned to
             _client.ExecuteAndWait(async () =>
             {
-                await _client.Connect("MjQwNzUyMDgxOTI4MDYwOTI4.Cvy1UQ.wmqwZri4SqxkUSpcI4Evc099Ja0", TokenType.Bot);
+                string XML = Path.GetFullPath("Tokens.xml");
+                XmlDocument doc = new XmlDocument();
+                doc.Load(XML);
+                string DiscordToken = doc.ChildNodes.Item(1).InnerText.ToString();
+                
+
+                await _client.Connect(DiscordToken, TokenType.Bot);
 
             });
         }
