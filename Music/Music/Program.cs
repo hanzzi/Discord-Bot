@@ -17,22 +17,25 @@ using System.IO;
 namespace Music
 {
     class Program
-    {
+    {   
+        [STAThread]
         static void Main(string[] args) => new Program().Start();
 
-        private DiscordClient _client;
-        private IAudioClient _audio;
+        public static DiscordClient _client;
+        public static IAudioClient _audio;
 
-
+        [STAThread]
         public void Start()
         {
             _client = new DiscordClient(x =>
             {
-                x.AppName = "DankBot";
-                x.LogLevel = LogSeverity.Info;
+                x.AppName = "Slightly above average bot";
+                x.LogLevel = LogSeverity.Debug;
                 x.LogHandler = Log;
 
             });
+
+            LoadConfig.Load();
 
             _client.UsingCommands(x =>
             {
@@ -49,7 +52,9 @@ namespace Music
                 x.Mode = AudioMode.Outgoing;
             });
 
+            Audio audio = new Audio();
 
+            audio.AudioStartup();
 
             CreateCommands();
 
@@ -60,14 +65,17 @@ namespace Music
                 XmlDocument doc = new XmlDocument();
                 doc.Load(XML);
                 string DiscordToken = doc.ChildNodes.Item(1).InnerText.ToString();
-                
 
-                await _client.Connect(DiscordToken, TokenType.Bot);
+                try
+                {
+                    await _client.Connect(DiscordToken, TokenType.Bot);
+                } catch (Exception)
+                {
+                    Console.WriteLine("Something went wrong most likely the token you are using is invalid. Silly Human");
+                }
 
             });
         }
-
-        
 
         // Log Functon
         public void Log(object sender, LogMessageEventArgs e)
@@ -160,7 +168,7 @@ namespace Music
                 .Do(async (e) =>
                {
                    string TextToLeet = e.GetArg("Text");
-                   string Text = ConvertToLeet(TextToLeet, e);
+                   string Text = Converters.ConvertToLeet(TextToLeet, e);
                    await e.Channel.SendMessage(Text);
 
                });
@@ -178,7 +186,7 @@ namespace Music
                 .Do(async (e) =>
                 {
                     string Query = e.GetArg("query");
-                    string Wolframify = WolframQueryHandler(Query);
+                    string Wolframify = Converters.WolframQueryHandler(Query);
                     await e.Channel.SendMessage(Wolframify);
                 });
 
@@ -213,15 +221,15 @@ namespace Music
                 .Description("Bombs the chat with cats")
                 .Do(async (e) =>
                 {
-                    e.Channel.SendFile("cat.jpg");
-                    e.Channel.SendFile("cat2.jpg");
-                    e.Channel.SendFile("cat3.jpg");
-                    e.Channel.SendFile("cat4.jpg");
-                    e.Channel.SendFile("cat5.jpg");
-                    e.Channel.SendFile("cat6.jpg");
-                    e.Channel.SendFile("cat7.jpg");
-                    e.Channel.SendFile("cat8.jpg");
-                    e.Channel.SendFile("cat9.jpg");
+                    await e.Channel.SendFile(Path.GetFullPath("cat.jpg"));
+                    await e.Channel.SendFile(Path.GetFullPath("cat2.jpg"));
+                    await e.Channel.SendFile(Path.GetFullPath("cat3.jpg"));
+                    await e.Channel.SendFile(Path.GetFullPath("cat4.jpg"));
+                    await e.Channel.SendFile(Path.GetFullPath("cat5.jpg"));
+                    await e.Channel.SendFile(Path.GetFullPath("cat6.jpg"));
+                    await e.Channel.SendFile(Path.GetFullPath("cat7.jpg"));
+                    await e.Channel.SendFile(Path.GetFullPath("cat8.jpg"));
+                    await e.Channel.SendFile(Path.GetFullPath("cat9.jpg"));
 
                 });
 
@@ -242,6 +250,7 @@ namespace Music
                });
             
             CService.CreateCommand("Join")
+                .Parameter("Url", ParameterType.Required)
                 .Description("Joins a voice channel")
                 .Do(async (e) =>
                 {
@@ -250,6 +259,9 @@ namespace Music
 
                     _audio = await _client.GetService<AudioService>()
                     .Join(voiceChannel);
+
+                    Audio Audio = new Audio();
+                    Audio.Download(e.GetArg("Url"));
 
                 });
 
@@ -262,7 +274,7 @@ namespace Music
                 
 
             CService.CreateCommand("kick")
-                .Alias("Pity the fool", "this person is annoying", "I am slightly annoyed with this person")
+                .Alias("Pitythefool", "thispersonisannoying", "IAmSlightlyAnnoyedWithThisPerson")
                 .Parameter("user")
                 .Description("Kicks a User, what did you expect?")
                 .Do(async (e) =>
@@ -300,7 +312,7 @@ namespace Music
                 });
 
             CService.CreateCommand("ClearConsole")
-                .Alias("CConsole", "Console", "CC", "Could you please clear the console my good sir")
+                .Alias("CConsole", "Console", "CC", "Couldyoupleasecleartheconsolemygoodsir")
                 .Description("Clears the Console so I can actually see whats happening")
                 .Do((e) =>
                 {
@@ -317,109 +329,30 @@ namespace Music
                 });
 
             CService.CreateCommand("Fix")
-                .Alias("Issue", "Broken af", "Cancer Bot", "Bugs", "Report Bug", "Report issue")
+                .Alias("Issue", "Brokenaf", "CancerBot", "Bugs", "ReportBug", "Reportissue")
                 .Description("Bug reports")
                 .Do(async (e) =>
                {
                    await e.Channel.SendMessage("Please forward any issues to the issues tab of my Github Repository: https://github.com/hanzzi/Discord-Bot/issues");
                });
-        }
 
-
-        // Converts a string to Lower LeetSpeak
-        public static string ConvertToLeet(string ToLeet, CommandEventArgs e)
-        {
-            string[] carr = new string[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", ".", " ", "[", "]", "Æ", "Ø", "Å" };
-            string[] arr = new string[] { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", ".", " ", "[", "]", "æ", "ø", "å" };
-            string[] larr = new string[] { "4", "8", "(", "d", "3", "f", "9", "#", "!", "j", "k", "1", "m", "~", "0", "p", "q", "r", "5", "7", "u", "v", "w", "*", "y", "2", ".", " ", "[", "]", "æ", "ø", "å" };
-
-            string RESULT = "";
-            if (ToLeet.Length <= 0)
-            {
-                e.Channel.SendMessage("Message must Contain characters to convert to leet speak");
-            }
-            else
-            {
-                foreach (char ch in ToLeet)
+            CService.CreateCommand("Bee")
+                .Do(async (e) =>
                 {
-                    if (Convert.ToInt32(ch) == Convert.ToInt32(ConsoleKey.Enter))
-                    { RESULT = RESULT + "\r\n"; }
-                    for (int c = 0; c < arr.Length; c++)
-                    {
-                        if (ch.ToString() == arr[c])
-                            RESULT = RESULT + larr[c];
-                    }
-                    if (Convert.ToInt32(ch) == Convert.ToInt32(ConsoleKey.Enter))
-                    { RESULT = RESULT + "\r\n"; }
-                    for (int c = 0; c < carr.Length; c++)
-                    {
-                        if (ch.ToString() == carr[c])
-                            RESULT = RESULT + larr[c];
-                    }
-                }
-            }
-            return RESULT;
+                    await e.Channel.SendMessage("Accordion to all known laws of aviation, there is no way that a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyways. Because bees don't care what humans think is impossible.");
+                });
+
+            CService.CreateCommand("Bolden")
+                .Parameter("query", ParameterType.Unparsed)
+                .Do((e) =>
+                {
+                    e.Channel.SendMessage(Converters.Embolden(e.GetArg("query"), e));
+                });
         }
+
         
-        public static string WolframQueryHandler(string query)
-        {
-            WolframAlpha wolfram = new WolframAlpha("U23WH8-ALE9R832G2");
-            StringBuilder sb = new StringBuilder();
-            string EndResult = "";
-            
-            QueryResult results = wolfram.Query(query);
-            
-            if (results != null)
-            {
-                foreach (Pod pod in results.Pods)
-                {
-                    sb.Append(pod.Title);
-                   
-                    if (pod.SubPods != null)
-                    {
-                        foreach (SubPod subPod in pod.SubPods)
-                        {
-                            sb.AppendLine(subPod.Title);
-                            sb.AppendLine(subPod.Plaintext);
-                        }
-                    }
-                }
-                
-            }
-            string Value = sb.ToString();
-            if (Value == "")
-            {
-                Value = "The Query was not accepted please try again";
-            }
-            return Value;
-        }
 
-        public void SendAudio(string filePath)
-        {
-            var channelCount = _client.GetService<AudioService>().Config.Channels; // Get the number of AudioChannels our AudioService has been configured to use.
-            var OutFormat = new WaveFormat(48000, 16, channelCount); // Create a new Output Format, using the spec that Discord will accept, and with the number of channels that our client supports.
-            using (var MP3Reader = new Mp3FileReader(filePath)) // Create a new Disposable MP3FileReader, to read audio from the filePath parameter
-            using (var resampler = new MediaFoundationResampler(MP3Reader, OutFormat)) // Create a Disposable Resampler, which will convert the read MP3 data to PCM, using our Output Format
-            {
-                resampler.ResamplerQuality = 60; // Set the quality of the resampler to 60, the highest quality
-                int blockSize = OutFormat.AverageBytesPerSecond / 50; // Establish the size of our AudioBuffer
-                byte[] buffer = new byte[blockSize];
-                int byteCount;
-
-                while ((byteCount = resampler.Read(buffer, 0, blockSize)) > 0) // Read audio into our buffer, and keep a loop open while data is present
-                {
-                    if (byteCount < blockSize)
-                    {
-                        // Incomplete Frame
-                        for (int i = byteCount; i < blockSize; i++)
-                            buffer[i] = 0;
-                    }
-                    _audio.Send(buffer, 0, blockSize); // Send the buffer to Discord
-                }
-            }
-
-        }
-
+        
 
     }
 }

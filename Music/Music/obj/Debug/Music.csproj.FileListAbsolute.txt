@@ -27,3 +27,5 @@ D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WolframAlpha.NE
 C:\Users\sjf59mbr\Desktop\Discord-Bot\Music\Music\bin\Debug\Music.exe.config
 C:\Users\sjf59mbr\Desktop\Discord-Bot\Music\Music\obj\Debug\Music.exe
 C:\Users\sjf59mbr\Desktop\Discord-Bot\Music\Music\obj\Debug\Music.pdb
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\libvideo.compat.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\libvideo.dll
