@@ -11,15 +11,23 @@ namespace Music
     class LoadConfig
     { 
 
-        public static void Load()
+        public static void Load(string Method, string MusicPath)
         {
             try
             {
+                 
                 // Loads the Config.xml file which contains options and tokens
                 string XML = Path.GetFullPath("Config.xml");
                 XmlDocument doc = new XmlDocument();
                 doc.Load(XML);
-                SetInfo(doc);
+                if (Method == "SetInfo")
+                {
+                    SetInfo(doc);
+                }
+                if (Method == "SavePath")
+                {
+                    SavePath(doc, MusicPath);
+                }
             }
             catch (FileNotFoundException)
             {
@@ -32,6 +40,28 @@ namespace Music
             Config.DiscordToken = doc.ChildNodes.Item(1).ChildNodes.Item(0).InnerText.ToString();
 
             Config.MusicFolder = doc.ChildNodes.Item(1).ChildNodes.Item(1).InnerText.ToString();
+        }
+
+        public static void SavePath(XmlDocument doc, string MusicPath)
+        {
+            XmlWriterSettings Settings = new XmlWriterSettings();
+            //Settings.Encoding = System.Text.Encoding.UTF8;
+            Settings.Indent = true;
+
+            // Generates a new Config file.
+            using (XmlWriter Writer = XmlWriter.Create(Path.GetFullPath("Config.xml"), Settings))
+            {
+
+                Writer.WriteStartDocument();
+                Writer.WriteStartElement("Config");
+
+                Writer.WriteElementString("DiscordToken", Config.DiscordToken);
+
+                Writer.WriteElementString("MusicFolder", MusicPath);
+
+                Writer.WriteEndElement();
+                Writer.WriteEndDocument();
+            }
         }
     }
 }

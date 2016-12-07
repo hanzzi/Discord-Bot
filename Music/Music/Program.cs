@@ -35,7 +35,7 @@ namespace Music
 
             });
 
-            LoadConfig.Load();
+            LoadConfig.Load("SetInfo", null);
 
             _client.UsingCommands(x =>
             {
@@ -254,14 +254,22 @@ namespace Music
                 .Description("Joins a voice channel")
                 .Do(async (e) =>
                 {
-                    var voiceChannel = e.Message.User.VoiceChannel;
-                    Console.WriteLine("Channel:" + e.Message.User.VoiceChannel.ToString());
+                    try
+                    {
 
-                    _audio = await _client.GetService<AudioService>()
-                    .Join(voiceChannel);
 
-                    Audio Audio = new Audio();
-                    Audio.Download(e.GetArg("Url"));
+                        var voiceChannel = e.Message.User.VoiceChannel;
+                        Console.WriteLine("Channel:" + e.Message.User.VoiceChannel.ToString());
+
+                        _audio = await _client.GetService<AudioService>()
+                        .Join(voiceChannel);
+
+                        Audio Audio = new Audio();
+                        Audio.Download(e.GetArg("Url"));
+                    } catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
 
                 });
 

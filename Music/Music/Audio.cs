@@ -19,10 +19,12 @@ namespace Music
 {
     class Audio
     {
+        private Discord.Audio.IAudioClient _audio = Program._audio;
         [STAThread]
         public void AudioStartup()
         {
-            string path = Path.GetFullPath("YouTube");
+            string path = Config.MusicFolder;
+            //string FormatPath = path.Replace("\\", "\\\\");
             if (!Directory.Exists(path))
             {
                 Console.WriteLine("Music Folder not found please choose a music folder");
@@ -33,6 +35,7 @@ namespace Music
 
                 if (Dialog.ShowDialog() == DialogResult.OK)
                 {
+                    string newPath = Dialog.SelectedPath.Replace("\\\\", "\\");
                     Config.MusicFolder = Dialog.SelectedPath;
                 }
             }
@@ -40,7 +43,7 @@ namespace Music
 
         public void Test()
         {
-            string Filepath = Path.GetFullPath("YouTube\\Test3.mp4");
+            string Filepath = Path.GetFullPath("YouTube\\Test999.mp4");
             FFmpeg(Filepath);
         }
 
@@ -50,16 +53,18 @@ namespace Music
             var _TubeClient = YouTube.Default;
             var Video = _TubeClient.GetVideo(Url);
 
+            VideoFormat Format = Video.Format; // Gets the format of the video ie. wmv, avi, mp4, webm and so on
+            AudioFormat AudioFormat = Video.AudioFormat; // gets the format of the audio
+
             string Title = Video.Title;
             string FileExtension = Video.FileExtension;
             string FullName = Video.FullName;
-            int Resolution = Video.Resolution;
 
             byte[] bytes = Video.GetBytes();
             var stream = Video.Stream();
 
-            File.WriteAllBytes(Config.MusicFolder + "\\" + FullName, bytes);
-            string FilePath = (Config.MusicFolder + "\\" + FullName);
+            File.WriteAllBytes(Config.MusicFolder + "\\" + "Test5000" + FileExtension, bytes);
+            string FilePath = (Config.MusicFolder + "\\" + "Test5000" + FileExtension);
             FFmpeg(FilePath);
         }
 
@@ -87,11 +92,20 @@ namespace Music
                             .Read(buffer, 0, blockSize); // Read stdout into the buffer
 
                     if (byteCount == 0) // FFmpeg did not output anything
-                        break; // Break out of the while(true) loop, since there was nothing to read.
+                    {
+                        Thread.Sleep(3000); // Really bad hack consider a way of checking when its loading sound
+                        if (byteCount == 0)
+                        {
+                            
+                            break; // Break out of the while(true) loop, since there was nothing to read.
+                        }
+                    }
+                     
 
                     Program._audio.Send(buffer, 0, byteCount); // Send our data to Discord
                 }
                 Program._audio.Wait(); // Wait for the Voice Client to finish sending data, as ffMPEG may have already finished buffering out a song, and it is unsafe to return now.
+                _audio.Disconnect();
             }
             catch (Exception ex)
             {

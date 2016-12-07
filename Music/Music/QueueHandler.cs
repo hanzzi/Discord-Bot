@@ -8,6 +8,9 @@ namespace Music
 {
     class QueueHandler
     {
+        public void GetName()
+        {
 
+        }
     }
 }
