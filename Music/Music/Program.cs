@@ -13,6 +13,7 @@ using System.Threading;
 using NAudio.Wave;
 using System.Xml;
 using System.IO;
+using System.Diagnostics;
 
 namespace Music
 {
@@ -23,6 +24,8 @@ namespace Music
 
         public static DiscordClient _client;
         public static IAudioClient _audio;
+        public static bool SoundStopCall = false;
+        public static bool ChangeStation = false;
 
         [STAThread]
         public void Start()
@@ -92,15 +95,14 @@ namespace Music
         // Commands
         public void CreateCommands()
         {
-            var CService = _client.GetService<CommandService>();
+            CommandService CService = _client.GetService<CommandService>();
 
-            // returns pong
             CService.CreateCommand("ping")
-                .Description("Returns with an opposite but totally satisfactory answer.")
-                .Do(async (e) =>
-                {
-                    await e.Channel.SendMessage("Pong!");
-                });
+           .Description("Returns with an opposite but totally satisfactory answer.")
+           .Do(async (e) =>
+           {
+               await e.Channel.SendMessage("Pong!");
+           });
 
             CService.CreateCommand("Whatisthis")
                 .Description("Do you want to know what i am you have come to the right place")
@@ -123,7 +125,7 @@ namespace Music
                 .Do(async (e) =>
                 {
                     await e.Channel.SendFile("cat.jpg");
-                    
+
                 });
 
             CService.CreateCommand("MoarCatrito")
@@ -248,41 +250,96 @@ namespace Music
                    await e.Channel.DeleteMessages(toDelete).ConfigureAwait(false);
                    */
                });
-            
+
             CService.CreateCommand("Join")
-                .Parameter("Url", ParameterType.Required)
                 .Description("Joins a voice channel")
                 .Do(async (e) =>
                 {
                     try
                     {
-
-
                         var voiceChannel = e.Message.User.VoiceChannel;
                         Console.WriteLine("Channel:" + e.Message.User.VoiceChannel.ToString());
 
                         _audio = await _client.GetService<AudioService>()
                         .Join(voiceChannel);
 
-                        Audio Audio = new Audio();
-                        Audio.Download(e.GetArg("Url"));
                     } catch (Exception ex)
                     {
-                        Console.WriteLine(ex);
+                        Console.WriteLine($"DATA: {ex.Data}");
+                        Console.WriteLine($"INNER EXCEPTION: {ex.InnerException}");
+                        Console.WriteLine($"MESSAGE: {ex.Message}");
+                        Console.WriteLine($"SOURCE: {ex.Source}");
+                        Console.WriteLine($"STACK TRACE: {ex.StackTrace}");
                     }
 
                 });
 
             CService.CreateCommand("Leave")
                 .Description("Leaves the voice channels")
+                .Do((e) =>
+                {
+                    SoundStopCall = true;
+                });
+
+            CService.CreateCommand("Add")
+                .Parameter("Url", ParameterType.Required)
+                .Description("Adds a song to the queue")
                 .Do(async (e) =>
                 {
-                    await _audio.Channel.LeaveAudio();
+                    Audio Audio = new Audio();
+                    await Audio.Download(e.GetArg("Url"), e);
                 });
-                
+
+            CService.CreateCommand("Play")
+                .Description("Plays the Current Music queue")
+                .Do(async (e) =>
+                {
+                    await QueueHandler.NextSong(e);
+
+                });
+
+            CService.CreateCommand("Radio")
+                .Parameter("Url")
+                .Do((e) =>
+               {
+               Process[] Processes = Process.GetProcessesByName("ffmpeg");
+               if (Processes.Length != 0)
+                   ChangeStation = true;
+    
+                   Dictionary<string, string> Stations = LoadConfig.GetRadioStations();
+
+                   foreach (var Node in Stations.Keys)
+                   {
+                       //if (Stations.Keys.Any(key => key.Contains("DRP3")))
+                       if (Node.Contains(e.GetArg("Url")))
+                       {
+                           string StationLink = Stations[e.GetArg("Url")];
+                           Audio Audio = new Audio();
+                           Audio.RadioStations(StationLink, e);
+                       }
+                   }
+
+
+                   
+                });
+
+            CService.CreateCommand("Stations")
+                .Description("Displays the Radiostations available")
+                .Do(async (e) =>
+                {
+                    Dictionary<string, string> Stations = LoadConfig.GetRadioStations();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("```");
+                    foreach (string Node in Stations.Keys)
+                    {
+                        sb.Append(Node + Environment.NewLine);
+                    }
+                    sb.Append("```");
+                    await e.Channel.SendMessage(sb.ToString());
+                });
 
             CService.CreateCommand("kick")
-                .Alias("Pitythefool", "thispersonisannoying", "IAmSlightlyAnnoyedWithThisPerson")
                 .Parameter("user")
                 .Description("Kicks a User, what did you expect?")
                 .Do(async (e) =>
@@ -301,7 +358,7 @@ namespace Music
                         try
                         {
                             await usr.Kick().ConfigureAwait(false);
-                            await e.Channel.SendMessage(User + " has been KICKED you should pity the fool.");
+                            await e.Channel.SendMessage(User + " Got sent to the rice fields");
                         }
                         catch
                         {
@@ -310,22 +367,21 @@ namespace Music
                     }
                 });
 
-            
             CService.CreateCommand("Clear")
                 .Description("Clear a specified amount of messages")
                 .Parameter("Amount", ParameterType.Unparsed)
-                .Do((e) =>
+                .Do(async (e) =>
                 {
-                    e.Channel.SendMessage("LOL JK this feature has not been implemented");
+                    await e.Channel.SendMessage("LOL JK this feature has not been implemented");
                 });
 
             CService.CreateCommand("ClearConsole")
                 .Alias("CConsole", "Console", "CC", "Couldyoupleasecleartheconsolemygoodsir")
                 .Description("Clears the Console so I can actually see whats happening")
-                .Do((e) =>
+                .Do(async (e) =>
                 {
                     Console.Clear();
-                    e.Channel.SendMessage("The Console has been cleared");
+                    await e.Channel.SendMessage("The Console has been cleared");
                 });
 
             CService.CreateCommand("XD")
@@ -352,15 +408,12 @@ namespace Music
 
             CService.CreateCommand("Bolden")
                 .Parameter("query", ParameterType.Unparsed)
-                .Do((e) =>
+                .Do(async (e) =>
                 {
-                    e.Channel.SendMessage(Converters.Embolden(e.GetArg("query"), e));
+                    await e.Channel.SendMessage(Converters.Embolden(e.GetArg("query"), e));
                 });
+
+            
         }
-
-        
-
-        
-
     }
 }

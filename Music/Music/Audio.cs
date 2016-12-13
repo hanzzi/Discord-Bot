@@ -13,13 +13,15 @@ using System.Diagnostics;
 using System.Threading;
 using Music;
 using System.Windows.Forms;
-
+using System.Collections;
 
 namespace Music
 {
     class Audio
     {
         private Discord.Audio.IAudioClient _audio = Program._audio;
+
+        // Startup script to check if music folder is present could make check if ffmpeg is present.
         [STAThread]
         public void AudioStartup()
         {
@@ -39,40 +41,37 @@ namespace Music
                     Config.MusicFolder = Dialog.SelectedPath;
                 }
             }
+            
+
+            
          }
 
-        public void Test()
+        // Downloads youtube video and adds it to the queue
+        public async Task Download(string Url, CommandEventArgs e)
         {
-            string Filepath = Path.GetFullPath("YouTube\\Test999.mp4");
-            FFmpeg(Filepath);
-        }
+            YouTube _TubeClient = YouTube.Default;
+            YouTubeVideo Video = _TubeClient.GetVideo(Url);
 
-        public void Download(string Url)
-        {
-
-            var _TubeClient = YouTube.Default;
-            var Video = _TubeClient.GetVideo(Url);
-
-            VideoFormat Format = Video.Format; // Gets the format of the video ie. wmv, avi, mp4, webm and so on
-            AudioFormat AudioFormat = Video.AudioFormat; // gets the format of the audio
+            //IEnumerable<YouTubeVideo> Videos = _TubeClient.GetAllVideos(Url);
+            
+            // Gets the lowest possible quality of the video this severely worsens the audio quality but makes downloads extremely fast
+            //YouTubeVideo GetLowRes = GetResolution(Videos, 144);
 
             string Title = Video.Title;
-            string FileExtension = Video.FileExtension;
             string FullName = Video.FullName;
-
             byte[] bytes = Video.GetBytes();
-            var stream = Video.Stream();
+            
+            QueueHandler Queue = new QueueHandler();
 
-            File.WriteAllBytes(Config.MusicFolder + "\\" + "Test5000" + FileExtension, bytes);
-            string FilePath = (Config.MusicFolder + "\\" + "Test5000" + FileExtension);
-            FFmpeg(FilePath);
+            await Queue.AddItem(FullName.Replace(' ', '_'), bytes, e, Title);
         }
 
-        public void FFmpeg(string pathOrUrl)
+        // Streaming service for youtube audio stream
+        public async static Task FFmpeg(string pathOrUrl, CommandEventArgs e)
         {
             try
             {
-                var process = Process.Start(new ProcessStartInfo
+                Process process = Process.Start(new ProcessStartInfo
                 { // FFmpeg requires us to spawn a process and hook into its stdout, so we will create a Process
                     FileName = "ffmpeg",
                     Arguments = $"-i {pathOrUrl} " + // Here we provide a list of arguments to feed into FFmpeg. -i means the location of the file/URL it will read from
@@ -91,21 +90,24 @@ namespace Music
                     byteCount = process.StandardOutput.BaseStream // Access the underlying MemoryStream from the stdout of FFmpeg
                             .Read(buffer, 0, blockSize); // Read stdout into the buffer
 
-                    if (byteCount == 0) // FFmpeg did not output anything
+                    int breaklimit = 0;
+                    while (byteCount == 0 && breaklimit != 5)
                     {
-                        Thread.Sleep(3000); // Really bad hack consider a way of checking when its loading sound
-                        if (byteCount == 0)
-                        {
-                            
-                            break; // Break out of the while(true) loop, since there was nothing to read.
-                        }
+                        Thread.Sleep(2500);
+                        breaklimit++;
                     }
-                     
+                    
 
                     Program._audio.Send(buffer, 0, byteCount); // Send our data to Discord
+                    if (breaklimit == 6)
+                    {
+                        break;
+                    }
                 }
                 Program._audio.Wait(); // Wait for the Voice Client to finish sending data, as ffMPEG may have already finished buffering out a song, and it is unsafe to return now.
-                _audio.Disconnect();
+                
+                await QueueHandler.NextSong(e);
+                
             }
             catch (Exception ex)
             {
@@ -113,9 +115,80 @@ namespace Music
             }
         }
 
-        private void Converter()
+        // Streaming service for the radio stream
+        public static void RadioStream(string pathOrUrl, CommandEventArgs e)
         {
+            // Runs ffmpeg in another thread so it does not block non async methods like Createcommands effectively blocking everything
+            new Thread(() =>
+            {
+                try
+                {
+                    Process process = Process.Start(new ProcessStartInfo
+                    { // FFmpeg requires us to spawn a process and hook into its stdout, so we will create a Process
+                        FileName = "ffmpeg",
+                        Arguments = $"-i {pathOrUrl} -y " + // Here we provide a list of arguments to feed into FFmpeg. -i means the location of the file/URL it will read from
+                                "-f s16le -ar 48000 -ac 2 pipe:1", // Next, we tell it to output 16-bit 48000Hz PCM, over 2 channels, to stdout.
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true // Capture the stdout of the process
+                    });
+                    Thread.Sleep(2000); // Sleep for a few seconds to FFmpeg can start processing data.
 
+                    int blockSize = 3840; // The size of bytes to read per frame; 1920 for mono
+                    byte[] buffer = new byte[blockSize];
+                    int byteCount;
+
+                    while (true) // Loop forever, so data will always be read
+                    {
+                        byteCount = process.StandardOutput.BaseStream // Access the underlying MemoryStream from the stdout of FFmpeg
+                                .Read(buffer, 0, blockSize); // Read stdout into the buffer
+
+                        while (byteCount == 0)
+                        {
+                            Thread.Sleep(2500);
+                        }
+                        // Call from leave command consider making boolean a method and making it return
+                        if (Program.SoundStopCall == true)
+                        {
+                            Process[] Processes = Process.GetProcessesByName("ffmpeg");
+                            if (Processes.Length != 0)
+                            {
+                                foreach (Process Proc in Processes)
+                                {
+                                    Processes.FirstOrDefault().Kill();
+                                }
+                                Program._audio.Channel.LeaveAudio();
+                            }
+                            Program.SoundStopCall = false;
+
+                        }
+                        // call to change station, kills ffmpeg process to free up pipes or the pipe will break
+                        if (Program.ChangeStation == true)
+                        {
+                            // gets all processes named ffmpeg.
+                            Process[] Processes = Process.GetProcessesByName("ffmpeg");
+                            if (Processes.Length != 0)
+                            {
+                                // there is a possibility that there are multiple ffmpeg processes running kills them all
+                                foreach (Process Proc in Processes)
+                                {
+                                    Proc.Kill();
+                                }
+                            }
+                            Program.ChangeStation = false;
+
+                        }
+
+                        Program._audio.Send(buffer, 0, byteCount); // Send our data to Discord
+                    }
+
+                    //Program._audio.Wait(); // Wait for the Voice Client to finish sending data, as ffMPEG may have already finished buffering out a song, and it is unsafe to return now.
+                }
+
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }).Start();
         }
 
         public void SendAudio(string filePath)
@@ -148,6 +221,18 @@ namespace Music
                 Console.WriteLine(ex);
             }
 
+        }
+
+        // Displays all radiostations could make it a config and make it dynamic making it possible to add more dynamically
+        public static void RadioStations(string Url, CommandEventArgs e)
+        {
+            RadioStream(Url, e);
+        }
+
+        // Legacy code for getting the lowest possible resolution but due to the audio quality lowering HD video is used
+        public YouTubeVideo GetResolution(IEnumerable<YouTubeVideo> Videos, int LowestRes)
+        {
+            return Videos.First(x => x.Resolution == LowestRes);
         }
     }
 }

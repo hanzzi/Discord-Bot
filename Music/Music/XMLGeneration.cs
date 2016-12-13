@@ -9,13 +9,10 @@ using System.Xml;
 namespace Music
 {
     class XMLGeneration
-    {
-        private static bool GenXml = false;
-
+    { 
         // When a Config file is not present this method will be fired and instruct the user to either create a new one or get one
         public static void GenerateXML()
         {
-            GenXml = true;
             Console.WriteLine("Config.xml file not found do you wish to generate a new template");
             Console.WriteLine("Y/N");
             string key = Console.ReadLine();

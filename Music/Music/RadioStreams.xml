@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Stations>
+  <DRP3>http://live-icy.gss.dr.dk:8000/A/A05L.mp3</DRP3>
+  <Vejle>http://live-icy.gss.dr.dk:8000/A/A13H.mp3</Vejle>
+  <TheVoice>http://195.184.101.203/voice128</TheVoice>
+  <Myrock>http://stream.myrock.fm/myrock128</Myrock>
+  <NovaFM>http://stream.novafm.dk:80/nova128</NovaFM>
+  <RiseFM>http://stream.risefm.org:2052/stream</RiseFM>
+  <StreetStyle>http://fire.wavestreamer.com:5709/;?.mp3</StreetStyle>
+</Stations>

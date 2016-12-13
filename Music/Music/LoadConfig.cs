@@ -9,14 +9,14 @@ using System.Xml;
 namespace Music
 {
     class LoadConfig
-    { 
+    {
 
         public static void Load(string Method, string MusicPath)
         {
             try
             {
-                 
-                // Loads the Config.xml file which contains options and tokens
+
+                // Loads the Config.xml file which contains Config files
                 string XML = Path.GetFullPath("Config.xml");
                 XmlDocument doc = new XmlDocument();
                 doc.Load(XML);
@@ -63,5 +63,22 @@ namespace Music
                 Writer.WriteEndDocument();
             }
         }
+
+        public static Dictionary<string, string> GetRadioStations()
+        {
+            string xml = Path.GetFullPath("RadioStreams.xml");
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xml);
+
+            Dictionary<string, string> Dictionary = new Dictionary<string, string>();
+            foreach (XmlNode Node in doc.ChildNodes.Item(1))
+            {
+                Dictionary.Add(Node.Name, Node.InnerText);
+            }
+            
+            return Dictionary;
+
+        }
     }
+
 }

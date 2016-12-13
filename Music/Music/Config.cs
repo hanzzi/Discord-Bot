@@ -10,6 +10,8 @@ namespace Music
     {
         public static string DiscordToken { get; set; }
         public static string MusicFolder { get; set; }
+        public static string RadioStreamFolder { get; set; } // Used?????
+        
 
     }
 }

@@ -86,7 +86,6 @@ namespace Music
         {
             WolframAlpha wolfram = new WolframAlpha("U23WH8-ALE9R832G2");
             StringBuilder sb = new StringBuilder();
-            string EndResult = "";
 
             QueryResult results = wolfram.Query(query);
 
