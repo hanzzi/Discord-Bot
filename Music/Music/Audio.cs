@@ -44,7 +44,7 @@ namespace Music
             
 
             
-         }
+         } 
 
         // Downloads youtube video and adds it to the queue
         public async Task Download(string Url, CommandEventArgs e)
@@ -131,7 +131,7 @@ namespace Music
                         UseShellExecute = false,
                         RedirectStandardOutput = true // Capture the stdout of the process
                     });
-                    Thread.Sleep(2000); // Sleep for a few seconds to FFmpeg can start processing data.
+                    Thread.Sleep(2000); // Sleep for a few seconds so FFmpeg can start processing data.
 
                     int blockSize = 3840; // The size of bytes to read per frame; 1920 for mono
                     byte[] buffer = new byte[blockSize];

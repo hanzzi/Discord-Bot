@@ -10,12 +10,10 @@ D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Nito.AsyncEx.dl
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Nito.AsyncEx.Enlightenment.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\RestSharp.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WebSocket4Net.dll
-D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Newtonsoft.Json.xml
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Nito.AsyncEx.xml
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Nito.AsyncEx.Concurrent.xml
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Nito.AsyncEx.Enlightenment.xml
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\RestSharp.xml
-D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\obj\Debug\Music.csprojResolveAssemblyReference.cache
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\obj\Debug\Music.exe
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\obj\Debug\Music.pdb
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\NAudio.dll
@@ -29,3 +27,6 @@ C:\Users\sjf59mbr\Desktop\Discord-Bot\Music\Music\obj\Debug\Music.exe
 C:\Users\sjf59mbr\Desktop\Discord-Bot\Music\Music\obj\Debug\Music.pdb
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\libvideo.compat.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\libvideo.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\obj\Debug\Music.csprojResolveAssemblyReference.cache
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WeatherNet.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Newtonsoft.Json.xml

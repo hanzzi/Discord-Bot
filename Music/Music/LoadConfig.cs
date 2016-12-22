@@ -10,7 +10,7 @@ namespace Music
 {
     class LoadConfig
     {
-
+        // Loads the Config.xml file 
         public static void Load(string Method, string MusicPath)
         {
             try
@@ -35,13 +35,19 @@ namespace Music
             }
         }
 
+        // Sets the info for local use
         private static void SetInfo(XmlDocument doc)
         {
             Config.DiscordToken = doc.ChildNodes.Item(1).ChildNodes.Item(0).InnerText.ToString();
 
             Config.MusicFolder = doc.ChildNodes.Item(1).ChildNodes.Item(1).InnerText.ToString();
+
+            Config.TwitchUsername = doc.ChildNodes.Item(1).ChildNodes.Item(2).InnerText.ToString();
+
+            Config.TwitchToken = doc.ChildNodes.Item(1).ChildNodes.Item(3).InnerText.ToString();
         }
 
+        // Saves the info
         public static void SavePath(XmlDocument doc, string MusicPath)
         {
             XmlWriterSettings Settings = new XmlWriterSettings();
@@ -64,6 +70,7 @@ namespace Music
             }
         }
 
+        // Gets the radio stations in the RadioStations.xml
         public static Dictionary<string, string> GetRadioStations()
         {
             string xml = Path.GetFullPath("RadioStreams.xml");

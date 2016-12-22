@@ -15,6 +15,7 @@ namespace Music
         private static int CurrentIndex = 0;
         private Audio Audio = new Audio();
 
+        // Adds an item to the queue
         public async Task AddItem(string FullName, byte[] bytes, CommandEventArgs e, string Name)
         {
             int Count = MusicQueue.Count;
@@ -28,6 +29,7 @@ namespace Music
 
         }
 
+        // Gets the next song in the queue
         public async static Task NextSong(CommandEventArgs e)
         {
             object[] MusicArray = MusicQueue.ToArray();

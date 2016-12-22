@@ -6,10 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using WolframAlphaNET;
 using WolframAlphaNET.Objects;
+using WeatherNet;
+using WeatherNet.Clients;
+using WeatherNet.Model;
+using WeatherNet.Util;
+using System.Text.RegularExpressions;
 
 namespace Music
 {
-    class Converters
+    class QueryHandlers
     {
         // Generates a string of Discord Emojis from a string
         public static string Embolden(string query, CommandEventArgs e)
@@ -114,5 +119,110 @@ namespace Music
             return Value;
         }
 
+        public async Task Forecast(string City, string Country, CommandEventArgs e, string iterations)
+        {
+            int cycles = Convert.ToInt32(iterations);
+            StringBuilder sb = new StringBuilder();
+            sb.Append("```");
+            sb.Append(Environment.NewLine + "Weather Forecast for");
+            Result<FiveDaysForecastResult> Weather = FiveDaysForecast.GetByCityName(City, Country, "en", "metric");
+            var WeatherArray = Weather.Items.ToList();
+            for (int i = 0; i < cycles; i++)
+            {
+                sb.Append($"{Environment.NewLine}{WeatherArray[i].City}");
+                sb.Append($"{Environment.NewLine}Date: {WeatherArray[i].Date}");
+                sb.Append($"{Environment.NewLine}Clouds: {WeatherArray[i].Clouds}");
+                sb.Append($"{Environment.NewLine}Description: {WeatherArray[i].Description}");
+                sb.Append($"{Environment.NewLine}Humidity: {WeatherArray[i].Humidity}");
+                sb.Append($"{Environment.NewLine}Temperature: {WeatherArray[i].Temp}");
+                sb.Append($"{Environment.NewLine}Wind Speed {WeatherArray[i].WindSpeed}");
+                sb.Append($"{Environment.NewLine}");
+            }
+            sb.Append("```");
+            await e.Channel.SendMessage(sb.ToString());
+        }
+
+        public async Task Weather(string City, string Country, CommandEventArgs e)
+        {
+            Random rnd = new Random();
+            var Weather = CurrentWeather.GetByCityName(City, Country, "en", "metric");
+            StringBuilder sb = new StringBuilder();
+            sb.Append("```");
+            sb.Append($"Current Weather for {Weather.Item.City}{Environment.NewLine}");
+            sb.Append($"Date: {Weather.Item.Date}{Environment.NewLine}");
+            sb.Append($"Description: {Weather.Item.Description}{Environment.NewLine}");
+            sb.Append($"Humidity {Weather.Item.Humidity}{Environment.NewLine}");
+            sb.Append($"Temperature: {Weather.Item.Temp}C{Environment.NewLine}");
+            sb.Append($"Windspeed: {Weather.Item.WindSpeed}{Environment.NewLine}");
+            sb.Append($"Dankness {rnd.Next(0, 100)}%");
+            sb.Append("```");
+
+
+            await e.Channel.SendMessage(sb.ToString());
+
+        }
+
+        public async Task CelciustoFahrenheit(CommandEventArgs e)
+        {
+            if (Regex.IsMatch(e.GetArg("Temperature"), @"-?\d+(\.\d+)?"))
+            {
+                double Celcius = Convert.ToInt32(e.GetArg("Temperature"));
+                double ConvertToFahrenheit = (Celcius * 9 / 5 + 32);
+                await e.Channel.SendMessage(ConvertToFahrenheit.ToString() + "F");
+            }
+        }
+
+        public async Task CelciusToKelvin(CommandEventArgs e)
+        {
+            if (Regex.IsMatch(e.GetArg("Temperature"), @"-?\d+(\.\d+)?"))
+            {
+                double KelvinAdd = 273.15;
+                double Celcius = Convert.ToInt32(e.GetArg("Temperature"));
+                double ConvertToKelvin = (Celcius + KelvinAdd);
+                await e.Channel.SendMessage(ConvertToKelvin.ToString() + "K");
+            }
+        }
+
+        public async Task FahrenheitToKelvin(CommandEventArgs e)
+        {
+            if (Regex.IsMatch(e.GetArg("Temperature"), @"-?\d+(\.\d+)?"))
+            {
+                double Kelvin = Convert.ToInt32(e.GetArg("Temperature"));
+                double ConvertToKelvin = ((Kelvin + 459.67) * 5/9);
+                await e.Channel.SendMessage(ConvertToKelvin.ToString() + "K");
+            }
+        }
+
+        public async Task FahrenheitToCelcius(CommandEventArgs e)
+        {
+            if (Regex.IsMatch(e.GetArg("Temperature"), @"-?\d+(\.\d+)?"))
+            {
+                double Fahrenheit = Convert.ToInt32(e.GetArg("Temperature"));
+                double ConvertToCelcius = ((Fahrenheit-32) * 5/9);
+                await e.Channel.SendMessage(ConvertToCelcius.ToString() + "C");
+            }
+        }
+
+        public async Task KelvinToCelcius(CommandEventArgs e)
+        {
+            if (Regex.IsMatch(e.GetArg("Temperature"), @"-?\d+(\.\d+)?"))
+            {
+                double KelvinSubtract = 273.15;
+                double Kelvin = Convert.ToInt32(e.GetArg("Temperature"));
+                double ConvertToCelcius = (Kelvin - KelvinSubtract);
+                await e.Channel.SendMessage(ConvertToCelcius.ToString() + "C");
+            }
+        }
+
+        public async Task KelvinToFahrenheit(CommandEventArgs e)
+        {
+            if (Regex.IsMatch(e.GetArg("Temperature"), @"-?\d+(\.\d+)?"))
+            {
+                double KelvinSubtract = 459.67;
+                double Kelvin = Convert.ToInt32(e.GetArg("Temperature"));
+                double ConvertToFahrenheit = (Kelvin * 9/5 - KelvinSubtract);
+                await e.Channel.SendMessage(ConvertToFahrenheit.ToString() + "C");
+            }
+        }
     }
 }

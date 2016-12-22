@@ -14,11 +14,16 @@ using NAudio.Wave;
 using System.Xml;
 using System.IO;
 using System.Diagnostics;
+using WeatherNet.Clients;
+using WeatherNet.Model;
+using WeatherNet.Util;
+using WeatherNet;
+using System.Text.RegularExpressions;
 
 namespace Music
 {
     class Program
-    {   
+    {
         [STAThread]
         static void Main(string[] args) => new Program().Start();
 
@@ -35,14 +40,20 @@ namespace Music
                 x.AppName = "Slightly above average bot";
                 x.LogLevel = LogSeverity.Debug;
                 x.LogHandler = Log;
-
             });
+
+            Rejseplanen Rejseplanen = new Rejseplanen();
+            //Rejseplanen.GetOrigin("Jelling");
+
+            // WeatherClient settings, simple af wrapper ftw
+            ClientSettings.ApiUrl = "http://api.openweathermap.org/data/2.5";
+            ClientSettings.ApiKey = "fcfe7b29887978832c6400a5629fc468";
 
             LoadConfig.Load("SetInfo", null);
 
             _client.UsingCommands(x =>
             {
-                x.PrefixChar = '!';
+                x.PrefixChar = '?';
                 x.AllowMentionPrefix = true;
                 x.HelpMode = HelpMode.Public;
             });
@@ -64,15 +75,11 @@ namespace Music
             // Connect to any and all servers which the bot is assigned to
             _client.ExecuteAndWait(async () =>
             {
-                string XML = Path.GetFullPath("Tokens.xml");
-                XmlDocument doc = new XmlDocument();
-                doc.Load(XML);
-                string DiscordToken = doc.ChildNodes.Item(1).InnerText.ToString();
-
                 try
                 {
-                    await _client.Connect(DiscordToken, TokenType.Bot);
-                } catch (Exception)
+                    await _client.Connect(Config.DiscordToken, TokenType.Bot);
+                }
+                catch (Exception)
                 {
                     Console.WriteLine("Something went wrong most likely the token you are using is invalid. Silly Human");
                 }
@@ -125,7 +132,6 @@ namespace Music
                 .Do(async (e) =>
                 {
                     await e.Channel.SendFile("cat.jpg");
-
                 });
 
             CService.CreateCommand("MoarCatrito")
@@ -161,7 +167,6 @@ namespace Music
                     {
                         await e.Channel.SendMessage("Tails");
                     }
-
                 });
 
             CService.CreateCommand("leet")
@@ -170,9 +175,8 @@ namespace Music
                 .Do(async (e) =>
                {
                    string TextToLeet = e.GetArg("Text");
-                   string Text = Converters.ConvertToLeet(TextToLeet, e);
+                   string Text = QueryHandlers.ConvertToLeet(TextToLeet, e);
                    await e.Channel.SendMessage(Text);
-
                });
 
             CService.CreateCommand("whoishans")
@@ -188,7 +192,7 @@ namespace Music
                 .Do(async (e) =>
                 {
                     string Query = e.GetArg("query");
-                    string Wolframify = Converters.WolframQueryHandler(Query);
+                    string Wolframify = QueryHandlers.WolframQueryHandler(Query);
                     await e.Channel.SendMessage(Wolframify);
                 });
 
@@ -240,15 +244,6 @@ namespace Music
                 .Do(async (e) =>
                {
                    await e.Channel.SendMessage("Snek is our lord and savior only surpassed by the almighty Hanzzi and his band of imaginary friends the twins Depression and Debugging.");
-                   /*
-                   Thread.Sleep(500);
-                   ulong DankBot = 243638460663988225;
-                   var msgs = (await e.Channel.DownloadMessages(1).ConfigureAwait(false)).Where(m => DankBot == DankBot)?.ToArray();
-                   if (msgs == null || !msgs.Any())
-                       return;
-                   var toDelete = msgs as Message[] ?? msgs.ToArray();
-                   await e.Channel.DeleteMessages(toDelete).ConfigureAwait(false);
-                   */
                });
 
             CService.CreateCommand("Join")
@@ -302,15 +297,14 @@ namespace Music
                 .Parameter("Url")
                 .Do((e) =>
                {
-               Process[] Processes = Process.GetProcessesByName("ffmpeg");
-               if (Processes.Length != 0)
-                   ChangeStation = true;
-    
+                   Process[] Processes = Process.GetProcessesByName("ffmpeg");
+                   if (Processes.Length != 0)
+                       ChangeStation = true;
+
                    Dictionary<string, string> Stations = LoadConfig.GetRadioStations();
 
                    foreach (var Node in Stations.Keys)
                    {
-                       //if (Stations.Keys.Any(key => key.Contains("DRP3")))
                        if (Node.Contains(e.GetArg("Url")))
                        {
                            string StationLink = Stations[e.GetArg("Url")];
@@ -318,10 +312,7 @@ namespace Music
                            Audio.RadioStations(StationLink, e);
                        }
                    }
-
-
-                   
-                });
+               });
 
             CService.CreateCommand("Stations")
                 .Description("Displays the Radiostations available")
@@ -375,13 +366,29 @@ namespace Music
                     await e.Channel.SendMessage("LOL JK this feature has not been implemented");
                 });
 
-            CService.CreateCommand("ClearConsole")
-                .Alias("CConsole", "Console", "CC", "Couldyoupleasecleartheconsolemygoodsir")
+            CService.CreateCommand("Purge")
+                .Parameter("Messages", ParameterType.Required)
                 .Description("Clears the Console so I can actually see whats happening")
                 .Do(async (e) =>
                 {
-                    Console.Clear();
-                    await e.Channel.SendMessage("The Console has been cleared");
+                    int PruneMessages = 0;
+
+                    if (Regex.IsMatch(e.GetArg("Messages"), @"-?\d+(\.\d+)?"))
+                    {
+                        if (e.GetArg("Messages") != null)
+                            PruneMessages = Convert.ToInt32(e.GetArg("Messages"));
+
+                        if (e.User.ServerPermissions.ManageMessages)
+                        {
+                            PruneMessages++;
+                            Message[] Messages = await e.Channel.DownloadMessages(PruneMessages);
+                            await e.Channel.DeleteMessages(Messages);
+                        }
+                        else
+                        {
+                            await e.Channel.SendMessage("You do not have the required permissions");
+                        }
+                    }
                 });
 
             CService.CreateCommand("XD")
@@ -410,10 +417,159 @@ namespace Music
                 .Parameter("query", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    await e.Channel.SendMessage(Converters.Embolden(e.GetArg("query"), e));
+                    await e.Channel.SendMessage(QueryHandlers.Embolden(e.GetArg("query"), e));
                 });
 
-            
+            CService.CreateCommand("TheSmoke")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("I'll have two number 9s, a number 9 large, a number 6 with extra dip, a number 7, two number 45s, one with cheese, and a large soda.");
+                    await e.Channel.SendFile("The Smoke.jpg");
+                });
+
+            CService.CreateCommand("Forecast")
+                .Description("Gives the forecast for a city")
+                .Parameter("City", ParameterType.Required)
+                .Parameter("Country", ParameterType.Required)
+                .Parameter("Iterations", ParameterType.Required)
+                .Do(async (e) =>
+                {
+                    QueryHandlers Handler = new QueryHandlers();
+                    await Handler.Forecast(e.GetArg("City"), e.GetArg("Country"), e, e.GetArg("Iterations"));
+                });
+
+            CService.CreateCommand("Weather")
+                .Description("Gets the current weather for area")
+                .Parameter("City", ParameterType.Required)
+                .Parameter("Country", ParameterType.Required)
+                .Do(async (e) =>
+                {
+                    QueryHandlers Query = new QueryHandlers();
+                    await Query.Weather(e.GetArg("City"), e.GetArg("Country"), e);
+                });
+
+            CService.CreateCommand("Color")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("IT'S CALLED FUCKING COLOUR YOU FUCKING IMBECILE");
+                });
+
+            CService.CreateCommand("ZeroWidthSpace")
+                .Description("Sends a zero width space")
+                .Do(async (e) =>
+                {
+                    await e.Channel.SendMessage("Between these <​> there is a zero width space");
+                });
+
+            CService.CreateCommand("CelciusToFahrenheit")
+                .Description("Converts Celcius to Fahrenheit")
+                .Alias("CToF")
+                .Parameter("Temperature", ParameterType.Required)
+                .Do(async (e) =>
+                {
+                    QueryHandlers Conversion = new QueryHandlers();
+                    await Conversion.CelciustoFahrenheit(e);
+                });
+
+            CService.CreateCommand("FahrenheitToCelcius")
+                .Parameter("Temperature", ParameterType.Required)
+                .Alias("FToC")
+                .Description("Converts Fahrenheit to Celcius")
+                .Do(async (e) =>
+                {
+                    QueryHandlers Handler = new QueryHandlers();
+                    await Handler.FahrenheitToCelcius(e);
+                });
+
+            CService.CreateCommand("CelciusToKelvin")
+                .Description("Converts Celcius to Kelvin")
+                .Alias("CToK")
+                .Parameter("Temperature", ParameterType.Required)
+                .Do(async (e) =>
+                {
+                    QueryHandlers Handler = new QueryHandlers();
+                    await Handler.CelciusToKelvin(e);
+                });
+
+            CService.CreateCommand("FPS")
+                .Description("Displays the current FPS on the Bot (Not Really)")
+                .Do(async (e) =>
+                {
+                    Random rnd = new Random();
+                    await e.Channel.SendMessage($"The Current FPS is: {rnd.Next(59, 200)}");
+                });
+
+            CService.CreateCommand("GTFO")
+                .Description("Tells the bot to get the fuck out of your server and never come back.")
+                .Do( (e) =>
+               {
+                   EventHandler<MessageEventArgs> RecievedMessage = null;
+                   RecievedMessage = async delegate (object s, MessageEventArgs m)
+                   {
+
+                       if (e.Message.User == m.Message.User)
+                       {
+                           if (m.Message.RawText == "y" | m.Message.RawText == "Y" | m.Message.RawText == "Yes" | m.Message.RawText == "yes")
+                           {
+                               await m.Channel.SendMessage("Urgh fine ill leave.");
+                               _client.MessageReceived -= RecievedMessage;
+                               Thread.Sleep(2000);
+                               await e.Server.Leave();
+                           }
+                           if (m.Message.RawText == "n" | m.Message.RawText == "N" | m.Message.RawText == "No" | m.Message.RawText == "no")
+                           {
+                               await m.Channel.SendMessage("why are you so indecisive");
+                               _client.MessageReceived -= RecievedMessage;
+                           }
+                       }
+                       
+                   };
+
+                   if (e.User.ServerPermissions.Administrator)
+                   {
+                       e.Channel.SendMessage("Are you sure you want me gone? Y/N");
+                       _client.MessageReceived += RecievedMessage;
+                   }
+               });
+
+            // Rejseplanen Group Commands
+            _client.GetService<CommandService>().CreateGroup("Trip", Trip =>
+            {
+                Trip.CreateCommand("Search")
+                .Description("Searches for a stop or Address")
+                .Parameter("Input", ParameterType.Unparsed)
+                .Do(async (e) =>
+                {
+                    Rejseplanen Rp = new Rejseplanen();
+                    await Rp.UserInputSearch(e.GetArg("Input"), e);
+                });
+
+                Trip.CreateCommand("Plan")
+                .Description("Plans a trip from Rejseplanen.dk Syntax: StartingPointID, Destination Coordinate X, Destination Coordinate Y, Date, Time, Destination name")
+                .Parameter("Origin", ParameterType.Required)
+                .Parameter("Destination", ParameterType.Required)
+                .Do(async (e) =>
+                {
+                    string OriginID = e.GetArg("OriginID");
+                    string DestCoordX = e.GetArg("DestCoordX");
+                    string DestCoordY = e.GetArg("DestCoordY");
+                    string Date = e.GetArg("Date");
+                    string Time = e.GetArg("Time");
+                    string DestCoordName = e.GetArg("DestCoordName");
+
+                    Rejseplanen Rp = new Rejseplanen();
+                    //await Rp.PlanTrip(OriginID, DestCoordX, DestCoordY, DestCoordName, Date, Time, e);
+                });
+
+                Trip.CreateCommand("GetOrigin")
+                .Parameter("Origin", ParameterType.Required)
+                .Parameter("Destination", ParameterType.Required)
+                .Do(async (e) =>
+                {
+                    Rejseplanen Travel = new Rejseplanen();
+                    await Travel.GetOrigin(e, e.GetArg("Origin"), e.GetArg("Destination"));
+                });
+            });
         }
     }
 }
