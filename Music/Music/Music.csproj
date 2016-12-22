@@ -125,7 +125,6 @@
     <Content Include="bin\Debug\RadioStreams.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config.xml" />
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
