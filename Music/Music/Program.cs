@@ -43,7 +43,6 @@ namespace Music
             });
 
             Rejseplanen Rejseplanen = new Rejseplanen();
-            //Rejseplanen.GetOrigin("Jelling");
 
             // WeatherClient settings, simple af wrapper ftw
             ClientSettings.ApiUrl = "http://api.openweathermap.org/data/2.5";
@@ -295,7 +294,7 @@ namespace Music
 
             CService.CreateCommand("Radio")
                 .Parameter("Url")
-                .Do((e) =>
+                .Do(async (e) =>
                {
                    Process[] Processes = Process.GetProcessesByName("ffmpeg");
                    if (Processes.Length != 0)
@@ -544,6 +543,8 @@ namespace Music
                     await Rp.UserInputSearch(e.GetArg("Input"), e);
                 });
 
+                // More Advanced Trip planning but utterly unuserfriendly but for future additions it might be useful
+                /*
                 Trip.CreateCommand("Plan")
                 .Description("Plans a trip from Rejseplanen.dk Syntax: StartingPointID, Destination Coordinate X, Destination Coordinate Y, Date, Time, Destination name")
                 .Parameter("Origin", ParameterType.Required)
@@ -559,9 +560,9 @@ namespace Music
 
                     Rejseplanen Rp = new Rejseplanen();
                     //await Rp.PlanTrip(OriginID, DestCoordX, DestCoordY, DestCoordName, Date, Time, e);
-                });
+                });*/
 
-                Trip.CreateCommand("GetOrigin")
+                Trip.CreateCommand("Plan")
                 .Parameter("Origin", ParameterType.Required)
                 .Parameter("Destination", ParameterType.Required)
                 .Do(async (e) =>

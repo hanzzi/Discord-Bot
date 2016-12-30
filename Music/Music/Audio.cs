@@ -55,6 +55,7 @@ namespace Music
             //IEnumerable<YouTubeVideo> Videos = _TubeClient.GetAllVideos(Url);
             
             // Gets the lowest possible quality of the video this severely worsens the audio quality but makes downloads extremely fast
+            // Consider finding a way to only get the best quality audio without video but this is only applicable with large files and slow connections and neither are very useful in the current scope.
             //YouTubeVideo GetLowRes = GetResolution(Videos, 144);
 
             string Title = Video.Title;
@@ -91,7 +92,7 @@ namespace Music
                             .Read(buffer, 0, blockSize); // Read stdout into the buffer
 
                     int breaklimit = 0;
-                    while (byteCount == 0 && breaklimit != 5)
+                    while (byteCount == 0 /*&& breaklimit != 5*/) // counter for failed attempts and sleeps so ffmpeg can read more audio
                     {
                         Thread.Sleep(2500);
                         breaklimit++;
@@ -99,14 +100,14 @@ namespace Music
                     
 
                     Program._audio.Send(buffer, 0, byteCount); // Send our data to Discord
-                    if (breaklimit == 6)
+                    if (breaklimit == 6) // when the breaklimit reaches 6 failed attempts its fair to say that ffmpeg has either crashed or is finished with the song
                     {
-                        break;
+                        break; // breaks the audio stream
                     }
                 }
                 Program._audio.Wait(); // Wait for the Voice Client to finish sending data, as ffMPEG may have already finished buffering out a song, and it is unsafe to return now.
                 
-                await QueueHandler.NextSong(e);
+                await QueueHandler.NextSong(e); // starts the stream for the next song
                 
             }
             catch (Exception ex)
@@ -149,32 +150,32 @@ namespace Music
                         // Call from leave command consider making boolean a method and making it return
                         if (Program.SoundStopCall == true)
                         {
-                            Process[] Processes = Process.GetProcessesByName("ffmpeg");
+                            Process[] Processes = Process.GetProcessesByName("ffmpeg"); // gets all processes called ffmpeg if more than one instance of ffmpeg is present unstable effects WILL occur
                             if (Processes.Length != 0)
                             {
                                 foreach (Process Proc in Processes)
                                 {
-                                    Processes.FirstOrDefault().Kill();
+                                    Processes.FirstOrDefault().Kill(); // gets the first process called ffmpeg
                                 }
-                                Program._audio.Channel.LeaveAudio();
+                                Program._audio.Channel.LeaveAudio(); // leaves the audio channel
                             }
-                            Program.SoundStopCall = false;
+                            Program.SoundStopCall = false; // resets the soundstopcall
 
                         }
-                        // call to change station, kills ffmpeg process to free up pipes or the pipe will break
+                        // call to change station, kills ffmpeg process to free up pipes or the pipe will break or overflow
                         if (Program.ChangeStation == true)
                         {
                             // gets all processes named ffmpeg.
-                            Process[] Processes = Process.GetProcessesByName("ffmpeg");
+                            Process[] Processes = Process.GetProcessesByName("ffmpeg"); // gets all processes called ffmpeg
                             if (Processes.Length != 0)
                             {
                                 // there is a possibility that there are multiple ffmpeg processes running kills them all
                                 foreach (Process Proc in Processes)
                                 {
-                                    Proc.Kill();
+                                    Proc.Kill(); // kills the process
                                 }
                             }
-                            Program.ChangeStation = false;
+                            Program.ChangeStation = false; // resets the changestation call
 
                         }
 
@@ -191,6 +192,7 @@ namespace Music
             }).Start();
         }
 
+        // Unused method of sending audio uses nAudio
         public void SendAudio(string filePath)
         {
             try

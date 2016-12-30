@@ -20,12 +20,14 @@ namespace Music
 
         private WebClient _WebClient = new WebClient();
 
+        // searches for the input given by the user
         public async Task UserInputSearch(string UserInput, CommandEventArgs e)
         {
             _WebClient.BaseAddress = BaseUrl;
 
             Uri URI = new Uri($"{BaseUrl}/location?input={UserInput}");
-
+            
+            // Downloads the string and stacks it in neat rows when migrating to 1.0 consider making this with a embedbuilder
            _WebClient.DownloadStringCompleted += async (s, m) =>
            {
                string Response = m.Result;
@@ -38,7 +40,7 @@ namespace Music
                StringBuilder sb = new StringBuilder();
                sb.Capacity = 2000;
                sb.Append("```");
-               // TODO: Replace Break Function with stringbuilder buffer which works as a character counter
+               // TODO: Replace Break Function with stringbuilder buffer which works as a character counter. MIGHT NOT WORK
                foreach (XmlNode Node in StopLocations)
                {
                    sb.Append(Node.Attributes[0].OuterXml + Environment.NewLine);
@@ -58,6 +60,7 @@ namespace Music
 
         }
 
+        // gets the starting point
         public async Task GetOrigin(CommandEventArgs e, string Origin, string Destination)
         {
             _WebClient.BaseAddress = BaseUrl;
@@ -69,6 +72,7 @@ namespace Music
             string OriginY = null;
             string OriginID = null;
 
+            // Subscribes to the event when the webclient has finished loading a page
             _WebClient.DownloadStringCompleted += async (s, m) =>
             {
                 if (OriginDone != true)
@@ -83,6 +87,7 @@ namespace Music
                     XmlNodeList CoordLocation = root.SelectNodes("//LocationList/CoordLocation");
                     StringBuilder sb = new StringBuilder();
 
+                    // Gets the Attributes if the current string is of the type stoplocation
                     if (root.FirstChild.Name == "StopLocation")
                     {
                         try
@@ -97,6 +102,7 @@ namespace Music
                         }
 
                     }
+                    // Gets the Attributes if the current string is of the type coordlocation
                     if (root.FirstChild.Name == "CoordLocation")
                     {
                         try
@@ -107,6 +113,7 @@ namespace Music
                             OriginY = StopLocation.Item(0).Attributes[2].Value;
                             OriginID = StopLocation.Item(0).Attributes[3].Value;
                         }
+                        // if the query gets nothing an indexoutofrangeexeption is thrown and an error message is sent
                         catch (IndexOutOfRangeException RangeEx)
                         {
                             await e.Channel.SendMessage("Query failed try again");
@@ -123,6 +130,7 @@ namespace Music
 
         }
 
+        // gets the destination
         public async Task GetDestination(CommandEventArgs e, string Destination, string OriginID)
         {
             _WebClient.BaseAddress = BaseUrl;
@@ -134,6 +142,7 @@ namespace Music
             string DestY = null;
             string DestID = null;
 
+            // Subscribes to the event when the webclient has finished loading a page
             _WebClient.DownloadStringCompleted += async (s, m) =>
             {
                 if (DestinationDone != true)

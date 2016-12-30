@@ -30,3 +30,6 @@ D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\libvideo.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\obj\Debug\Music.csprojResolveAssemblyReference.cache
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WeatherNet.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Newtonsoft.Json.xml
+C:\Users\hans\Source\Repos\Discord Bots\Discord-Bot\Music\Music\bin\Debug\Music.exe.config
+C:\Users\hans\Source\Repos\Discord Bots\Discord-Bot\Music\Music\obj\Debug\Music.exe
+C:\Users\hans\Source\Repos\Discord Bots\Discord-Bot\Music\Music\obj\Debug\Music.pdb
