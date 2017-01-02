@@ -18,7 +18,6 @@ D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\obj\Debug\Music.exe
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\obj\Debug\Music.pdb
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\NAudio.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\NAudio.xml
-D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Discord.Net.Modules.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WolframAlpha.NET.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WolframAlpha.NET.pdb
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WolframAlpha.NET.xml
@@ -29,7 +28,7 @@ D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\libvideo.compat
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\libvideo.dll
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\obj\Debug\Music.csprojResolveAssemblyReference.cache
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\WeatherNet.dll
-D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Newtonsoft.Json.xml
 C:\Users\hans\Source\Repos\Discord Bots\Discord-Bot\Music\Music\bin\Debug\Music.exe.config
 C:\Users\hans\Source\Repos\Discord Bots\Discord-Bot\Music\Music\obj\Debug\Music.exe
 C:\Users\hans\Source\Repos\Discord Bots\Discord-Bot\Music\Music\obj\Debug\Music.pdb
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Newtonsoft.Json.xml

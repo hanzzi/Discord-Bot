@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Audio;
 using Discord.Commands;
-using Discord.Modules;
 using WolframAlphaNET;
 using WolframAlphaNET.Objects;
 using System.Threading;
@@ -35,6 +34,7 @@ namespace Music
         [STAThread]
         public void Start()
         {
+
             _client = new DiscordClient(x =>
             {
                 x.AppName = "Slightly above average bot";
@@ -42,13 +42,14 @@ namespace Music
                 x.LogHandler = Log;
             });
 
+
             Rejseplanen Rejseplanen = new Rejseplanen();
+
+            LoadConfig.Load("SetInfo", null);
 
             // WeatherClient settings, simple af wrapper ftw
             ClientSettings.ApiUrl = "http://api.openweathermap.org/data/2.5";
-            ClientSettings.ApiKey = "fcfe7b29887978832c6400a5629fc468";
-
-            LoadConfig.Load("SetInfo", null);
+            ClientSettings.ApiKey = Config.WeatherAPIToken;
 
             _client.UsingCommands(x =>
             {
@@ -294,6 +295,7 @@ namespace Music
 
             CService.CreateCommand("Radio")
                 .Parameter("Url")
+#pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
                 .Do(async (e) =>
                {
                    Process[] Processes = Process.GetProcessesByName("ffmpeg");
@@ -312,6 +314,7 @@ namespace Music
                        }
                    }
                });
+#pragma warning restore CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
 
             CService.CreateCommand("Stations")
                 .Description("Displays the Radiostations available")
@@ -545,7 +548,7 @@ namespace Music
 
                 // More Advanced Trip planning but utterly unuserfriendly but for future additions it might be useful
                 /*
-                Trip.CreateCommand("Plan")
+                Trip.CreateCommand("AdvPlan")
                 .Description("Plans a trip from Rejseplanen.dk Syntax: StartingPointID, Destination Coordinate X, Destination Coordinate Y, Date, Time, Destination name")
                 .Parameter("Origin", ParameterType.Required)
                 .Parameter("Destination", ParameterType.Required)
@@ -563,12 +566,30 @@ namespace Music
                 });*/
 
                 Trip.CreateCommand("Plan")
-                .Parameter("Origin", ParameterType.Required)
-                .Parameter("Destination", ParameterType.Required)
+                .Parameter("Origin", ParameterType.Unparsed)
+                .Description("Searches for a trip between two destinations seperated by a comma")
+                //.Parameter("Destination", ParameterType.Required)
                 .Do(async (e) =>
                 {
-                    Rejseplanen Travel = new Rejseplanen();
-                    await Travel.GetOrigin(e, e.GetArg("Origin"), e.GetArg("Destination"));
+                    string[] OriginAndDestination = e.GetArg("Origin").Split(',');
+                    if (OriginAndDestination.Length == 3 | OriginAndDestination.Length != 0)
+                    {
+                        string Origin = OriginAndDestination[0].Replace(" ", string.Empty);
+                        string Destination = OriginAndDestination[1].Replace(" ", string.Empty);
+                        int Iterations = Convert.ToInt32(OriginAndDestination[2].Replace(" ", string.Empty));
+
+                        Rejseplanen Travel = new Rejseplanen();
+                        await Travel.GetOrigin(e, Origin, Destination, Iterations);
+                    }
+                    else
+                        if (OriginAndDestination.Length == 0)
+                    {
+                        await e.Channel.SendMessage("Iterations cannot be 0");
+                        await e.Channel.SendMessage("Format invalid Correct format is: Origin, Destination, Iterations");
+                    }
+                    else
+
+                        await e.Channel.SendMessage("Format invalid Correct format is: Origin, Destination, Iterations");
                 });
             });
         }

@@ -61,7 +61,7 @@ namespace Music
         }
 
         // gets the starting point
-        public async Task GetOrigin(CommandEventArgs e, string Origin, string Destination)
+        public async Task GetOrigin(CommandEventArgs e, string Origin, string Destination, int Iterations)
         {
             _WebClient.BaseAddress = BaseUrl;
 
@@ -121,7 +121,7 @@ namespace Music
                         }
                     }
                     OriginDone = true;
-                    await GetDestination(e, Destination, OriginID);
+                    await GetDestination(e, Destination, OriginID, Iterations);
                 }
             };
             _WebClient.DownloadStringAsync(OriginURI);
@@ -131,7 +131,7 @@ namespace Music
         }
 
         // gets the destination
-        public async Task GetDestination(CommandEventArgs e, string Destination, string OriginID)
+        public async Task GetDestination(CommandEventArgs e, string Destination, string OriginID, int Iterations)
         {
             _WebClient.BaseAddress = BaseUrl;
 
@@ -181,13 +181,15 @@ namespace Music
                         }
                     }
                     DestinationDone = true;
-                    await PlanTrip(OriginID, DestX, DestY, DestName, e);
+                    await PlanTrip(OriginID, DestX, DestY, DestName, e, Iterations);
                 }
             };
             _WebClient.DownloadStringAsync(DestURI);
         }
 
-        public async Task PlanTrip(string OriginID, string DestCoordX, string DestCoordY, string DestCoordName, CommandEventArgs e)
+#pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
+        public async Task PlanTrip(string OriginID, string DestCoordX, string DestCoordY, string DestCoordName, CommandEventArgs e, int Iterations)
+#pragma warning restore CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
         {
             try
             {
@@ -210,15 +212,75 @@ namespace Music
                         XmlNodeList Origin = root.SelectNodes("//Trip/Leg/Origin");
                         XmlNodeList Destination = root.SelectNodes("//Trip/Leg/Destination");
                         StringBuilder sb = new StringBuilder();
-
-
+ 
                         int Tripcount = 1;
+                        int LegCount = 0;
+
+                        try
+                        {
+
+                            foreach (XmlNode Node in Trip)
+                            {
+                                sb.Append("```");
+                                sb.Append($"OPTION: {Tripcount}{Environment.NewLine}");
+
+                                for (int i = 0; i < Node.ChildNodes.Count; i++)
+                                {
+                                    if (Node.ChildNodes.Item(i).Attributes[1].Value == "IC" | Node.ChildNodes.Item(i).Attributes[1].Value == "ICL" | Node.ChildNodes.Item(i).Attributes[1].Value == "LYN")
+                                    {
+                                        // TRAIN FORMAT
+                                        sb.Append($"Train: {Node.ChildNodes.Item(i).Attributes[0].Value.ToString()}{Environment.NewLine}");
+                                        sb.Append($"From: {Node.ChildNodes.Item(i).ChildNodes.Item(0).Attributes.Item(0).Value}{Environment.NewLine}");
+                                        sb.Append($"Departure: {Node.ChildNodes.Item(i).ChildNodes.Item(0).Attributes.Item(3).Value}{Environment.NewLine}");
+                                        sb.Append($"To: {Node.ChildNodes.Item(i).ChildNodes.Item(1).Attributes.Item(0).Value}{Environment.NewLine}");
+                                        sb.Append($"Arrival: {Node.ChildNodes.Item(i).ChildNodes.Item(1).Attributes.Item(3).Value}{Environment.NewLine}");
+                                        sb.Append($"Date: {Node.ChildNodes.Item(i).ChildNodes.Item(0).Attributes.Item(4).Value}{Environment.NewLine}");
+                                        sb.Append($"Track: {Node.ChildNodes.Item(i).ChildNodes.Item(0).Attributes.Item(5).Value}{Environment.NewLine}");
+                                        sb.Append($"-------------------{Environment.NewLine}");
+                                    }
+                                    if (Node.ChildNodes.Item(i).Attributes[1].Value.ToString() == "BUS")
+                                    {
+                                        // BUS FORMAT
+                                        sb.Append($"Bus: {Node.ChildNodes.Item(i).Attributes[0].Value.ToString()}{Environment.NewLine}");
+                                        sb.Append($"From: {Node.ChildNodes.Item(i).ChildNodes.Item(0).Attributes.Item(0).Value}{Environment.NewLine}");
+                                        sb.Append($"Departure: {Node.ChildNodes.Item(i).ChildNodes.Item(0).Attributes.Item(3).Value}{Environment.NewLine}");
+                                        sb.Append($"To: {Node.ChildNodes.Item(i).ChildNodes.Item(1).Attributes.Item(0).Value}{Environment.NewLine}");
+                                        sb.Append($"Arrival: {Node.ChildNodes.Item(i).ChildNodes.Item(1).Attributes.Item(3).Value}{Environment.NewLine}");
+                                        sb.Append($"Date: {Node.ChildNodes.Item(i).ChildNodes.Item(0).Attributes.Item(4).Value}{Environment.NewLine}");
+                                        sb.Append($"-------------------{Environment.NewLine}");
+                                    }
+                                    if (Node.ChildNodes.Item(i).Attributes[1].Value.ToString() == "WALK")
+                                    {
+                                        sb.Append($"WALK{Environment.NewLine}");
+                                        sb.Append($"From: {Node.ChildNodes.Item(i).ChildNodes.Item(0).Attributes.Item(0).Value}{Environment.NewLine}");
+                                        sb.Append($"To: {Node.ChildNodes.Item(i).ChildNodes.Item(1).Attributes.Item(0).Value}{Environment.NewLine}");
+                                        sb.Append($"{Node.ChildNodes.Item(i).ChildNodes.Item(2).Attributes.Item(0).Value.Replace(";", string.Empty).Replace("Varighed", "Duration").Replace("Afstand", "Distance")}{Environment.NewLine}");
+                                        sb.Append($"-------------------{Environment.NewLine}");
+                                    }
+                                    
+                                }
+                                sb.Append("```");
+                                await e.Channel.SendMessage(sb.ToString());
+                                sb.Clear();
+                                Tripcount++;
+                                if (Tripcount > Iterations)
+                                    break;
+                            }
+                            Tripcount = 1;
+                        } catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
+                        }
+
+                        /*
                         foreach (XmlNode Node in Trip)
                         {
                             sb.Append("```");
                             sb.Append($"OPTION: {Tripcount}{Environment.NewLine}");
+
                             for (int i = 0; i < Legs.Count; i++)
                             {
+
                                 // Ignore all Steps with the type WALK to limit character usage
                                 if (Legs.Item(i).Attributes[1].Value != "WALK")
                                 {
@@ -251,7 +313,7 @@ namespace Music
                             await e.Channel.SendMessage(sb.ToString());
                             sb.Clear();
                             Tripcount++;
-                        }
+                        }*/
                     }
                     PlanTripDone = true;
                 };

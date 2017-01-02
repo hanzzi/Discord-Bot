@@ -42,7 +42,7 @@ namespace Music
 
             Config.MusicFolder = doc.ChildNodes.Item(1).ChildNodes.Item(1).InnerText.ToString();
 
-            Config.TwitchUsername = doc.ChildNodes.Item(1).ChildNodes.Item(2).InnerText.ToString();
+            Config.WeatherAPIToken = doc.ChildNodes.Item(1).ChildNodes.Item(2).InnerText.ToString();
 
             Config.TwitchToken = doc.ChildNodes.Item(1).ChildNodes.Item(3).InnerText.ToString();
         }
