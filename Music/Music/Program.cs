@@ -191,9 +191,10 @@ namespace Music
                 .Parameter("query", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
+                    QueryHandlers QueryHandlers = new QueryHandlers();
                     string Query = e.GetArg("query");
-                    string Wolframify = QueryHandlers.WolframQueryHandler(Query);
-                    await e.Channel.SendMessage(Wolframify);
+                    var Wolframify = QueryHandlers.WolframQueryHandler(Query, e);
+                   // await e.Channel.SendMessage(Wolframify);
                 });
 
             CService.CreateCommand("D10")
@@ -442,12 +443,22 @@ namespace Music
 
             CService.CreateCommand("Weather")
                 .Description("Gets the current weather for area")
-                .Parameter("City", ParameterType.Required)
-                .Parameter("Country", ParameterType.Required)
+                .Parameter("CityAndCountry", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    QueryHandlers Query = new QueryHandlers();
-                    await Query.Weather(e.GetArg("City"), e.GetArg("Country"), e);
+                    if (e.GetArg("CityAndCountry").Contains(","))
+                    {
+                        string[] Parameters = e.GetArg("CityAndCountry").Split(',');
+                        string City = Parameters[0];
+                        string Country = Parameters[1];
+
+                        QueryHandlers Query = new QueryHandlers();
+                        await Query.Weather(City, Country, e);
+                    } else
+                    {
+                        await e.Channel.SendMessage("Remember to put a Comma in between the City and Country");
+                    }
+
                 });
 
             CService.CreateCommand("Color")
@@ -473,6 +484,16 @@ namespace Music
                     await Conversion.CelciustoFahrenheit(e);
                 });
 
+            CService.CreateCommand("CelciusToKelvin")
+                .Description("Converts Celcius to Kelvin")
+                .Alias("CToK")
+                .Parameter("Temperature", ParameterType.Required)
+                .Do(async (e) =>
+                {
+                    QueryHandlers Handler = new QueryHandlers();
+                    await Handler.CelciusToKelvin(e);
+                });
+
             CService.CreateCommand("FahrenheitToCelcius")
                 .Parameter("Temperature", ParameterType.Required)
                 .Alias("FToC")
@@ -483,14 +504,34 @@ namespace Music
                     await Handler.FahrenheitToCelcius(e);
                 });
 
-            CService.CreateCommand("CelciusToKelvin")
-                .Description("Converts Celcius to Kelvin")
-                .Alias("CToK")
+            CService.CreateCommand("FahrenheitToKelvin")
                 .Parameter("Temperature", ParameterType.Required)
+                .Alias("FToK")
+                .Description("Converts Fahrenheit to Kelvin")
                 .Do(async (e) =>
                 {
                     QueryHandlers Handler = new QueryHandlers();
-                    await Handler.CelciusToKelvin(e);
+                    await Handler.FahrenheitToKelvin(e);
+                });
+
+            CService.CreateCommand("KelvinToCelcius")
+                .Parameter("Temperature", ParameterType.Required)
+                .Alias("KToC")
+                .Description("Converts Kelvin to Celcius")
+                .Do(async (e) =>
+                {
+                    QueryHandlers Handler = new QueryHandlers();
+                    await Handler.KelvinToCelcius(e);
+                });
+
+            CService.CreateCommand("KelvinToFahrenheit")
+                .Parameter("Temperature", ParameterType.Required)
+                .Alias("KToF")
+                .Description("Converts Kelvin to Fahrenheit")
+                .Do(async (e) =>
+                {
+                    QueryHandlers Handler = new QueryHandlers();
+                    await Handler.KelvinToFahrenheit(e);
                 });
 
             CService.CreateCommand("FPS")

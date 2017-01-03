@@ -24,6 +24,7 @@ namespace Music
         public async Task UserInputSearch(string UserInput, CommandEventArgs e)
         {
             _WebClient.BaseAddress = BaseUrl;
+            _WebClient.Encoding = System.Text.Encoding.UTF8;
 
             Uri URI = new Uri($"{BaseUrl}/location?input={UserInput}");
             
@@ -64,6 +65,7 @@ namespace Music
         public async Task GetOrigin(CommandEventArgs e, string Origin, string Destination, int Iterations)
         {
             _WebClient.BaseAddress = BaseUrl;
+            _WebClient.Encoding = System.Text.Encoding.UTF8;
 
             Uri OriginURI = new Uri($"{BaseUrl}/location?input={Origin}");
 
@@ -85,7 +87,7 @@ namespace Music
                     XmlElement root = doc.DocumentElement;
                     XmlNodeList StopLocation = root.SelectNodes("//LocationList/StopLocation");
                     XmlNodeList CoordLocation = root.SelectNodes("//LocationList/CoordLocation");
-                    StringBuilder sb = new StringBuilder();
+                    
 
                     // Gets the Attributes if the current string is of the type stoplocation
                     if (root.FirstChild.Name == "StopLocation")
@@ -107,11 +109,17 @@ namespace Music
                     {
                         try
                         {
-                            // If the first Location is a CoordLocation get the first StopLocation 
-                            OriginName = StopLocation.Item(0).Attributes[0].Value;
-                            OriginX = StopLocation.Item(0).Attributes[1].Value;
-                            OriginY = StopLocation.Item(0).Attributes[2].Value;
-                            OriginID = StopLocation.Item(0).Attributes[3].Value;
+                            if (StopLocation != null)
+                            {
+                                // If the first Location is a CoordLocation get the first StopLocation 
+                                OriginName = StopLocation.Item(0).Attributes[0].Value;
+                                OriginX = StopLocation.Item(0).Attributes[1].Value;
+                                OriginY = StopLocation.Item(0).Attributes[2].Value;
+                                OriginID = StopLocation.Item(0).Attributes[3].Value;
+                            } else
+                            {
+                                await e.Channel.SendMessage("Origin Returned Null try again");
+                            }
                         }
                         // if the query gets nothing an indexoutofrangeexeption is thrown and an error message is sent
                         catch (IndexOutOfRangeException RangeEx)
@@ -131,7 +139,7 @@ namespace Music
         }
 
         // gets the destination
-        public async Task GetDestination(CommandEventArgs e, string Destination, string OriginID, int Iterations)
+        private async Task GetDestination(CommandEventArgs e, string Destination, string OriginID, int Iterations)
         {
             _WebClient.BaseAddress = BaseUrl;
 
@@ -155,24 +163,35 @@ namespace Music
                     XmlElement root = doc.DocumentElement;
                     XmlNodeList StopLocation = root.SelectNodes("//LocationList/StopLocation");
                     XmlNodeList CoordLocation = root.SelectNodes("//LocationList/CoordLocation");
-                    StringBuilder sb = new StringBuilder();
 
                     if (root.FirstChild.Name == "StopLocation")
                     {
-                        DestName = StopLocation.Item(0).Attributes[0].Value;
-                        DestX = StopLocation.Item(0).Attributes[1].Value;
-                        DestY = StopLocation.Item(0).Attributes[2].Value;
-                        DestID = StopLocation.Item(0).Attributes[3].Value;
+                        if (StopLocation != null)
+                        {
+                            DestName = StopLocation.Item(0).Attributes[0].Value;
+                            DestX = StopLocation.Item(0).Attributes[1].Value;
+                            DestY = StopLocation.Item(0).Attributes[2].Value;
+                            DestID = StopLocation.Item(0).Attributes[3].Value;
+                        } else
+                        {
+                            await e.Channel.SendMessage("Destination returned null try again");
+                        }
 
                     }
                     if (root.FirstChild.Name == "CoordLocation")
                     {
                         try
                         {
-                            DestName = CoordLocation.Item(0).Attributes[0].Value;
-                            DestX = CoordLocation.Item(0).Attributes[1].Value;
-                            DestY = CoordLocation.Item(0).Attributes[2].Value;
-                            DestID = CoordLocation.Item(0).Attributes[3].Value;
+                            if (CoordLocation != null)
+                            {
+                                DestName = CoordLocation.Item(0).Attributes[0].Value;
+                                DestX = CoordLocation.Item(0).Attributes[1].Value;
+                                DestY = CoordLocation.Item(0).Attributes[2].Value;
+                                DestID = CoordLocation.Item(0).Attributes[3].Value;
+                            } else
+                            {
+                                await e.Channel.SendMessage("Destination returned null try again");
+                            }
                         }
                         catch (IndexOutOfRangeException RangeEx)
                         {
@@ -187,9 +206,7 @@ namespace Music
             _WebClient.DownloadStringAsync(DestURI);
         }
 
-#pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
-        public async Task PlanTrip(string OriginID, string DestCoordX, string DestCoordY, string DestCoordName, CommandEventArgs e, int Iterations)
-#pragma warning restore CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
+        private async Task PlanTrip(string OriginID, string DestCoordX, string DestCoordY, string DestCoordName, CommandEventArgs e, int Iterations)
         {
             try
             {
@@ -212,6 +229,7 @@ namespace Music
                         XmlNodeList Origin = root.SelectNodes("//Trip/Leg/Origin");
                         XmlNodeList Destination = root.SelectNodes("//Trip/Leg/Destination");
                         StringBuilder sb = new StringBuilder();
+                        
  
                         int Tripcount = 1;
                         int LegCount = 0;
@@ -269,51 +287,8 @@ namespace Music
                             Tripcount = 1;
                         } catch (Exception ex)
                         {
-                            Console.WriteLine(ex);
+                            await e.Channel.SendMessage("Query Failed");
                         }
-
-                        /*
-                        foreach (XmlNode Node in Trip)
-                        {
-                            sb.Append("```");
-                            sb.Append($"OPTION: {Tripcount}{Environment.NewLine}");
-
-                            for (int i = 0; i < Legs.Count; i++)
-                            {
-
-                                // Ignore all Steps with the type WALK to limit character usage
-                                if (Legs.Item(i).Attributes[1].Value != "WALK")
-                                {
-                                    // if Type of travel is Train
-                                    if (Legs.Item(i).Attributes[1].Value == "IC" | Legs.Item(i).Attributes[1].Value == "LYN" | Legs.Item(i).Attributes[1].Value == "REG" | Legs.Item(i).Attributes[1].Value == "S" | Legs.Item(i).Attributes[1].Value == "TOG")
-                                    {
-                                        sb.Append($"Train: {Legs.Item(i).Attributes[0].Value}{Environment.NewLine}");
-                                        sb.Append($"From: {Origin.Item(i).Attributes[0].Value}{Environment.NewLine}");
-                                        sb.Append($"Departure: {Origin.Item(i).Attributes[3].Value}{Environment.NewLine}");
-                                        sb.Append($"To: {Destination.Item(i).Attributes[0].Value}{Environment.NewLine}");
-                                        sb.Append($"Arrival: {Destination.Item(i).Attributes[3].Value}{Environment.NewLine}");
-                                        sb.Append($"Date: {Origin.Item(i).Attributes[4].Value}{Environment.NewLine}");
-                                        sb.Append($"Track: {Origin.Item(i).Attributes[5].Value}{Environment.NewLine}");
-                                        sb.Append($"-------------------{Environment.NewLine}");
-                                    }
-                                    // If Type of travel is by bus
-                                    if (Legs.Item(i).Attributes[1].Value == "BUS" | Legs.Item(i).Attributes[1].Value == "EXB" | Legs.Item(i).Attributes[1].Value == "NB" | Legs.Item(i).Attributes[1].Value == "TB")
-                                    {
-                                        sb.Append($"Bus: {Legs.Item(i).Attributes[0].Value}{Environment.NewLine}");
-                                        sb.Append($"From: {Origin.Item(i).Attributes[0].Value}{Environment.NewLine}");
-                                        sb.Append($"Departure: {Origin.Item(i).Attributes[3].Value}{Environment.NewLine}");
-                                        sb.Append($"To: {Destination.Item(i).Attributes[0].Value}{Environment.NewLine}");
-                                        sb.Append($"Arrival: {Destination.Item(i).Attributes[3].Value}{Environment.NewLine}");
-                                        sb.Append($"Date: {Origin.Item(i).Attributes[4].Value}{Environment.NewLine}");
-                                        sb.Append($"-------------------{Environment.NewLine}");
-                                    }
-                                }
-                            }
-                            sb.Append("```");
-                            await e.Channel.SendMessage(sb.ToString());
-                            sb.Clear();
-                            Tripcount++;
-                        }*/
                     }
                     PlanTripDone = true;
                 };

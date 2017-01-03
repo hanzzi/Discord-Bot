@@ -20,7 +20,7 @@ namespace Music
         {
             int Count = MusicQueue.Count;
 
-            // Unasigned character is E022 used as a seperator this is chosen viewed results may vary
+            // Unassigned character is E022 used as a seperator this is chosen viewed results may vary
             string SaveItemName = $"{Count}{FullName}";
 
             MusicQueue.Enqueue(SaveItemName);

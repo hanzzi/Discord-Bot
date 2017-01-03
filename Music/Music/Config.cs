@@ -12,6 +12,6 @@ namespace Music
         public static string MusicFolder { get; set; }
         //public static string RadioStreamFolder { get; set; }
         public static string WeatherAPIToken { get; set; }
-        public static string TwitchToken { get; set; }
+        public static string WolframToken { get; set; }
     }
 }

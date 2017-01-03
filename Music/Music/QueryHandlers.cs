@@ -11,6 +11,8 @@ using WeatherNet.Clients;
 using WeatherNet.Model;
 using WeatherNet.Util;
 using System.Text.RegularExpressions;
+using System.Net;
+using System.IO;
 
 namespace Music
 {
@@ -87,10 +89,12 @@ namespace Music
         }
 
         // Queries Wolfram Alpha stuff
-        public static string WolframQueryHandler(string query)
+        public async Task WolframQueryHandler(string query, CommandEventArgs e)
         {
-            WolframAlpha wolfram = new WolframAlpha("U23WH8-ALE9R832G2");
+            WolframAlpha wolfram = new WolframAlpha(Config.WolframToken);
             StringBuilder sb = new StringBuilder();
+
+            string Image = null;
 
             QueryResult results = wolfram.Query(query);
 
@@ -104,20 +108,25 @@ namespace Music
                     {
                         foreach (SubPod subPod in pod.SubPods)
                         {
+                            Image = subPod.Image.Src;
                             sb.AppendLine(subPod.Title);
                             sb.AppendLine(subPod.Plaintext);
+                            if (Image != null)
+                                sb.AppendLine(Image);
                         }
                     }
+                    await e.Channel.SendMessage(sb.ToString());
+                    sb.Clear();
                 }
 
             }
             string Value = sb.ToString();
-            if (Value == "")
+            if (Value == string.Empty)
             {
                 Value = "The Query was not accepted please try again";
             }
-            return Value;
         }
+        
 
         public async Task Forecast(string City, string Country, CommandEventArgs e, string iterations)
         {
@@ -134,7 +143,7 @@ namespace Music
                 sb.Append($"{Environment.NewLine}Clouds: {WeatherArray[i].Clouds}");
                 sb.Append($"{Environment.NewLine}Description: {WeatherArray[i].Description}");
                 sb.Append($"{Environment.NewLine}Humidity: {WeatherArray[i].Humidity}");
-                sb.Append($"{Environment.NewLine}Temperature: {WeatherArray[i].Temp}");
+                sb.Append($"{Environment.NewLine}Temperature: {WeatherArray[i].Temp}C");
                 sb.Append($"{Environment.NewLine}Wind Speed {WeatherArray[i].WindSpeed}");
                 sb.Append($"{Environment.NewLine}");
             }
