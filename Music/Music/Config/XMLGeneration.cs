@@ -11,7 +11,7 @@ namespace Music
     class XMLGeneration
     { 
         // When a Config file is not present this method will be fired and instruct the user to either create a new one or get one
-        public static void GenerateXML()
+        public void GenerateXML()
         {
             Console.WriteLine("Config.xml file not found do you wish to generate a new template");
             Console.WriteLine("Y/N");

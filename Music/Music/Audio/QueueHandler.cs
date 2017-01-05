@@ -30,7 +30,7 @@ namespace Music
         }
 
         // Gets the next song in the queue
-        public async static Task NextSong(CommandEventArgs e)
+        public async Task NextSong(CommandEventArgs e)
         {
             object[] MusicArray = MusicQueue.ToArray();
 

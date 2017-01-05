@@ -45,7 +45,8 @@ namespace Music
 
             Rejseplanen Rejseplanen = new Rejseplanen();
 
-            LoadConfig.Load("SetInfo", null);
+            LoadConfig LoadConf = new LoadConfig();
+            LoadConf.Load("SetInfo", null);
 
             // WeatherClient settings, simple af wrapper ftw
             ClientSettings.ApiUrl = "http://api.openweathermap.org/data/2.5";
@@ -123,7 +124,7 @@ namespace Music
                 .Parameter("user", ParameterType.Unparsed)
                 .Do(async (e) =>
                 {
-                    var ToReturn = $"Hello {e.GetArg("user")}";
+                    var ToReturn = $"Hello {e.Message.User}";
                     await e.Channel.SendMessage(ToReturn);
                 });
 
@@ -193,8 +194,7 @@ namespace Music
                 {
                     QueryHandlers QueryHandlers = new QueryHandlers();
                     string Query = e.GetArg("query");
-                    var Wolframify = QueryHandlers.WolframQueryHandler(Query, e);
-                   // await e.Channel.SendMessage(Wolframify);
+                    await QueryHandlers.WolframQueryHandler(Query, e);
                 });
 
             CService.CreateCommand("D10")
@@ -222,6 +222,26 @@ namespace Music
                     Random rnd = new Random();
                     int Roll = rnd.Next(1, 21);
                     await e.Channel.SendMessage("The Dice Landed on " + Roll.ToString());
+                });
+
+            CService.CreateCommand("DiceRoll")
+                .Description("Rolls a dice several times")
+                .Parameter("Iterations")
+                .Do(async (e) =>
+                {
+                        StringBuilder sb = new StringBuilder();
+
+                        for (int i = 0; i < Convert.ToInt32(e.GetArg("Iterations")); i++)
+                        {
+                            Random rnd = new Random();
+
+                            int roll = rnd.Next(1, 7);
+
+                            Thread.Sleep(20);
+
+                            sb.Append($"{roll}{Environment.NewLine}");
+                        }
+                        await e.Channel.SendMessage(sb.ToString());
                 });
 
             CService.CreateCommand("CatBomb")
@@ -290,13 +310,13 @@ namespace Music
                 .Description("Plays the Current Music queue")
                 .Do(async (e) =>
                 {
-                    await QueueHandler.NextSong(e);
+                    QueueHandler Queue = new QueueHandler();
+                    await Queue.NextSong(e);
 
                 });
 
             CService.CreateCommand("Radio")
                 .Parameter("Url")
-#pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
                 .Do(async (e) =>
                {
                    Process[] Processes = Process.GetProcessesByName("ffmpeg");
@@ -311,11 +331,10 @@ namespace Music
                        {
                            string StationLink = Stations[e.GetArg("Url")];
                            Audio Audio = new Audio();
-                           Audio.RadioStations(StationLink, e);
+                           await Audio.RadioStations(StationLink, e);
                        }
                    }
                });
-#pragma warning restore CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
 
             CService.CreateCommand("Stations")
                 .Description("Displays the Radiostations available")
@@ -574,6 +593,8 @@ namespace Music
                        _client.MessageReceived += RecievedMessage;
                    }
                });
+
+            
 
             // Rejseplanen Group Commands
             _client.GetService<CommandService>().CreateGroup("Trip", Trip =>

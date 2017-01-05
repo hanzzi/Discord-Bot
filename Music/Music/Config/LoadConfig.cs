@@ -11,7 +11,7 @@ namespace Music
     class LoadConfig
     {
         // Loads the Config.xml file 
-        public static void Load(string Method, string MusicPath)
+        public void Load(string Method, string MusicPath)
         {
             try
             {
@@ -31,12 +31,13 @@ namespace Music
             }
             catch (FileNotFoundException)
             {
-                XMLGeneration.GenerateXML();
+                XMLGeneration Generate = new XMLGeneration();
+                Generate.GenerateXML();
             }
         }
 
         // Sets the info for local use
-        private static void SetInfo(XmlDocument doc)
+        private void SetInfo(XmlDocument doc)
         {
             Config.DiscordToken = doc.ChildNodes.Item(1).ChildNodes.Item(0).InnerText.ToString();
 

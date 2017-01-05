@@ -232,7 +232,6 @@ namespace Music
                         
  
                         int Tripcount = 1;
-                        int LegCount = 0;
 
                         try
                         {
@@ -285,7 +284,7 @@ namespace Music
                                     break;
                             }
                             Tripcount = 1;
-                        } catch (Exception ex)
+                        } catch (Exception)
                         {
                             await e.Channel.SendMessage("Query Failed");
                         }

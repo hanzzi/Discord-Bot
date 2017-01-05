@@ -106,8 +106,9 @@ namespace Music
                     }
                 }
                 Program._audio.Wait(); // Wait for the Voice Client to finish sending data, as ffMPEG may have already finished buffering out a song, and it is unsafe to return now.
-                
-                await QueueHandler.NextSong(e); // starts the stream for the next song
+
+                QueueHandler Queue = new QueueHandler();
+                await Queue.NextSong(e); // starts the stream for the next song
                 
             }
             catch (Exception ex)
@@ -117,7 +118,7 @@ namespace Music
         }
 
         // Streaming service for the radio stream
-        public static void RadioStream(string pathOrUrl, CommandEventArgs e)
+        public async Task RadioStream(string pathOrUrl, CommandEventArgs e)
         {
             // Runs ffmpeg in another thread so it does not block non async methods like Createcommands effectively blocking everything
             new Thread(() =>
@@ -192,8 +193,8 @@ namespace Music
             }).Start();
         }
 
-        // Unused method of sending audio uses nAudio
-        public void SendAudio(string filePath)
+        // Unused method of sending audio, uses nAudio
+        public async Task SendAudio(string filePath)
         {
             try
             {
@@ -226,12 +227,12 @@ namespace Music
         }
 
         // Displays all radiostations could make it a config and make it dynamic making it possible to add more dynamically
-        public static void RadioStations(string Url, CommandEventArgs e)
+        public async Task RadioStations(string Url, CommandEventArgs e)
         {
-            RadioStream(Url, e);
+            await RadioStream(Url, e);
         }
 
-        // Legacy code for getting the lowest possible resolution but due to the audio quality lowering HD video is used
+        // Legacy code for getting the lowest possible resolution but due to the audio quality lowering, HD video is used
         public YouTubeVideo GetResolution(IEnumerable<YouTubeVideo> Videos, int LowestRes)
         {
             return Videos.First(x => x.Resolution == LowestRes);

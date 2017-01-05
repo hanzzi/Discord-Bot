@@ -32,3 +32,31 @@ C:\Users\hans\Source\Repos\Discord Bots\Discord-Bot\Music\Music\bin\Debug\Music.
 C:\Users\hans\Source\Repos\Discord Bots\Discord-Bot\Music\Music\obj\Debug\Music.exe
 C:\Users\hans\Source\Repos\Discord Bots\Discord-Bot\Music\Music\obj\Debug\Music.pdb
 D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Newtonsoft.Json.xml
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.dll.config
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.Controls.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.MachineLearning.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.Math.Core.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.Math.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.Statistics.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\ZedGraph.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.xml
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.Controls.xml
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.MachineLearning.xml
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.Math.xml
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.Math.Core.xml
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\Accord.Statistics.xml
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\ZedGraph.xml
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\de\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\es\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\fr\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\hu\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\it\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\ja\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\pt\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\ru\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\sk\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\sv\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\tr\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\zh-cn\ZedGraph.resources.dll
+D:\Users\hans2734\Source\Repos\Discord-Bot\Music\Music\bin\Debug\zh-tw\ZedGraph.resources.dll

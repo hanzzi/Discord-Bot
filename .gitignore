@@ -5,6 +5,8 @@
 [Tt]okens.xml
 [Cc]onfig.xml
 [Rr]adioStreams.xml
+Config.xml
+config.xml
 
 # User-specific files
 *.suo
