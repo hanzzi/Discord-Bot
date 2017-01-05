@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <DiscordToken>DiscordTokenHere</DiscordToken>
+  <MusicFolder>Folder Where youtube videos is stored</MusicFolder>
+  <WeatherToken>OpenWeather API Token Hhere</WeatherToken>
+  <WolframToken>Wolfram Alpha Token here</WolframToken>
+</Config>
