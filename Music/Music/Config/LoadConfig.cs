@@ -46,6 +46,9 @@ namespace Music
             Config.WeatherAPIToken = doc.ChildNodes.Item(1).ChildNodes.Item(2).InnerText.ToString();
 
             Config.WolframToken = doc.ChildNodes.Item(1).ChildNodes.Item(3).InnerText.ToString();
+
+            Config.Prefix = doc.ChildNodes.Item(1).ChildNodes.Item(4).InnerText.ToString();
+            
         }
 
         // Saves the info

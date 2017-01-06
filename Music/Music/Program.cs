@@ -30,6 +30,7 @@ namespace Music
         public static IAudioClient _audio;
         public static bool SoundStopCall = false;
         public static bool ChangeStation = false;
+        
 
         [STAThread]
         public void Start()
@@ -54,7 +55,7 @@ namespace Music
 
             _client.UsingCommands(x =>
             {
-                x.PrefixChar = '?';
+                x.PrefixChar = Config.Prefix;
                 x.AllowMentionPrefix = true;
                 x.HelpMode = HelpMode.Public;
             });

@@ -66,34 +66,44 @@ namespace Music
             {
                 PlayableCoords Message;
 
+                string[] Coords = null;
+
+                AddCoordsString(Coords);
+
                 Enum.TryParse(e.Message.Text, out Message);
 
-                if (CurrentPlayer == Player.O)
+                if (Convert.ToChar(m.Message.Text) == Config.Prefix)
                 {
-                    foreach (KeyValuePair<PlayableCoords, Player> Coord in Coords)
+                    if (CurrentPlayer == Player.O)
                     {
-                        if (Message == Coord.Key)
+                        foreach (KeyValuePair<PlayableCoords, Player> Coord in Coords)
                         {
-                            if (Coord.Value != Player.X)
-                                Coords[Coord.Key] = CurrentPlayer;
-                            Check(CurrentPlayer, e);
+                            if (Message == Coord.Key)
+                            {
+                                if (Coord.Value != Player.X)
+                                    Coords[Coord.Key] = CurrentPlayer;
+
+                                Check(CurrentPlayer, e);
+                            }
                         }
                     }
-                }
-                else if (CurrentPlayer == Player.X)
-                {
-                    foreach (KeyValuePair<PlayableCoords, Player> Coord in Coords)
+                    else if (CurrentPlayer == Player.X)
                     {
-                        if (Message == Coord.Key)
+                        foreach (KeyValuePair<PlayableCoords, Player> Coord in Coords)
                         {
-                            if (Coord.Value != Player.O)
-                                Coords[Coord.Key] = CurrentPlayer;
-                            Check(CurrentPlayer, e);
+                            if (Message == Coord.Key)
+                            {
+                                if (Coord.Value != Player.O)
+                                    Coords[Coord.Key] = CurrentPlayer;
+
+                                Check(CurrentPlayer, e);
+                            }
                         }
                     }
-                } else
-                {
-                    e.Channel.SendMessage("Something went wrong remember you can only enter X or O");
+                    else
+                    {
+                        e.Channel.SendMessage("Something went wrong remember you can only enter X or O");
+                    }
                 }
                 
 
@@ -139,6 +149,19 @@ namespace Music
                 return true;
             }
             return false;
+        }
+
+        private void AddCoordsString(string[] CoordArray)
+        {
+            CoordArray[0] = "11";
+            CoordArray[1] = "12";
+            CoordArray[2] = "13";
+            CoordArray[3] = "21";
+            CoordArray[4] = "22";
+            CoordArray[5] = "23";
+            CoordArray[6] = "31";
+            CoordArray[7] = "32";
+            CoordArray[8] = "33";
         }
         
     }

@@ -13,5 +13,6 @@ namespace Music
         //public static string RadioStreamFolder { get; set; }
         public static string WeatherAPIToken { get; set; }
         public static string WolframToken { get; set; }
+        public static char Prefix { get; set; }
     }
 }
