@@ -163,7 +163,7 @@ namespace Music
                             Program.SoundStopCall = false; // resets the soundstopcall
 
                         }
-                        // call to change station, kills ffmpeg process to free up pipes or the pipe will break or overflow
+                        // call to change station, kills ffmpeg process to free up pipes otherwise the pipe will break or overflow
                         if (Program.ChangeStation == true)
                         {
                             // gets all processes named ffmpeg.

@@ -66,9 +66,9 @@ namespace Music
             {
                 PlayableCoords Message;
 
-                string[] Coords = null;
+                //string[] Coords = null;
 
-                AddCoordsString(Coords);
+                //AddCoordsString(Coords);
 
                 Enum.TryParse(e.Message.Text, out Message);
 
@@ -96,7 +96,13 @@ namespace Music
                                 if (Coord.Value != Player.O)
                                     Coords[Coord.Key] = CurrentPlayer;
 
-                                Check(CurrentPlayer, e);
+                                bool CheckIfWon = Check(CurrentPlayer, e);
+
+                                if (CheckIfWon == true)
+                                {
+                                    // UNSUBSCRIBE MESSAGERECIEVED
+                                    // MAKE MESSAGERECIEVED A METHOD
+                                }
                             }
                         }
                     }
@@ -105,47 +111,44 @@ namespace Music
                         e.Channel.SendMessage("Something went wrong remember you can only enter X or O");
                     }
                 }
-                
-
             });
         }
 
         private bool Check(Player CurrentPlayer, CommandEventArgs e)
         {
-
             if (Coords[PlayableCoords.Coord11] == CurrentPlayer && Coords[PlayableCoords.Coord12] == CurrentPlayer && Coords[PlayableCoords.Coord13] == CurrentPlayer)
             {
-                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coords 11, 12, 13 and has won the game");
+                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coordinates 11, 12, 13 and has won the game");
                 return true;
             }
 
             if (Coords[PlayableCoords.Coord31] == CurrentPlayer && Coords[PlayableCoords.Coord32] == CurrentPlayer && Coords[PlayableCoords.Coord33] == CurrentPlayer)
             {
-                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coords 31, 32, 33 and has won the game");
+                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coordinates 31, 32, 33 and has won the game");
                 return true;
             }
 
             if (Coords[PlayableCoords.Coord11] == CurrentPlayer && Coords[PlayableCoords.Coord21] == CurrentPlayer && Coords[PlayableCoords.Coord31] == CurrentPlayer)
             {
-                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coords 11, 21, 31 and has won the game");
+                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coordinates 11, 21, 31 and has won the game");
                 return true;
             }
 
             if (Coords[PlayableCoords.Coord31] == CurrentPlayer && Coords[PlayableCoords.Coord32] == CurrentPlayer && Coords[PlayableCoords.Coord33] == CurrentPlayer)
             {
-                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coords 31, 32, 33 and has won the game");
+                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coordinates 31, 32, 33 and has won the game");
                 return true;
             }
 
             if (Coords[PlayableCoords.Coord11] == CurrentPlayer && Coords[PlayableCoords.Coord22] == CurrentPlayer && Coords[PlayableCoords.Coord33] == CurrentPlayer)
             {
-                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coords 11, 22, 33 and has won the game");
+                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coordinates 11, 22, 33 and has won the game");
                 return true;
             }
 
             if (Coords[PlayableCoords.Coord33] == CurrentPlayer && Coords[PlayableCoords.Coord22] == CurrentPlayer && Coords[PlayableCoords.Coord31] == CurrentPlayer)
             {
-                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coords 33, 22, 31 and has won the game");
+                e.Channel.SendMessage($"{CurrentPlayer} Has Taken Coordinates 33, 22, 31 and has won the game");
                 return true;
             }
             return false;

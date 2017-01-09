@@ -595,8 +595,6 @@ namespace Music
                    }
                });
 
-            
-
             // Rejseplanen Group Commands
             _client.GetService<CommandService>().CreateGroup("Trip", Trip =>
             {
@@ -653,6 +651,19 @@ namespace Music
                     else
 
                         await e.Channel.SendMessage("Format invalid Correct format is: Origin, Destination, Iterations");
+                });
+            });
+
+            _client.GetService<CommandService>().CreateGroup("TicTacToe", TTT =>
+            {
+                TTT.CreateCommand("StartTTT")
+                .Description("Starts a game of Tic Tac Toe")
+                .Parameter("UserX", ParameterType.Required)
+                .Parameter("UserO", ParameterType.Required)
+                .Do(async (e) =>
+                {
+                    TicTacToe TicTac = new TicTacToe();
+                    await TicTac.TicTacToeStart(e, e.GetArg("UserX"), e.GetArg("UserO"), _client);
                 });
             });
         }
